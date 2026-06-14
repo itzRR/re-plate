@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import {
   ArrowLeft,
   Upload,
@@ -13,6 +13,8 @@ import {
   FileText,
   Check,
   Image as ImageIcon,
+  Sparkles,
+  Loader2,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { FOOD_CATEGORIES, DIETARY_TAGS } from '@/lib/constants';
@@ -29,6 +31,10 @@ export default function PostFoodPage() {
   const [pickupLocation, setPickupLocation] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
+
+  // AI description generation state
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   const toggleTag = (tag: string) => {
     setSelectedTags((prev) =>
@@ -48,6 +54,45 @@ export default function PostFoodPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitted(true);
+  };
+
+  const generateAIDescription = async () => {
+    if (!title.trim()) {
+      setAiError('Please enter a food title first');
+      setTimeout(() => setAiError(null), 3000);
+      return;
+    }
+
+    setAiLoading(true);
+    setAiError(null);
+
+    try {
+      const res = await fetch('/api/ai/generate-description', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: title.trim(),
+          quantity: quantity || '1',
+          unit,
+          category: category || 'other',
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to generate description');
+      }
+
+      setDescription(data.description);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'Something went wrong';
+      setAiError(message);
+      setTimeout(() => setAiError(null), 4000);
+    } finally {
+      setAiLoading(false);
+    }
   };
 
   if (submitted) {
@@ -177,14 +222,74 @@ export default function PostFoodPage() {
             </div>
 
             <div>
-              <label className="block text-sm text-slate-300 mb-1.5">Description</label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Describe the food, its condition, and any relevant details..."
-                rows={3}
-                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/30 focus:ring-1 focus:ring-emerald-500/20 transition-all text-sm resize-none"
-              />
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-sm text-slate-300">Description</label>
+                <motion.button
+                  type="button"
+                  onClick={generateAIDescription}
+                  disabled={aiLoading}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className={cn(
+                    'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold',
+                    'bg-gradient-to-r from-purple-500 to-pink-500',
+                    'text-white shadow-lg shadow-purple-500/25',
+                    'hover:shadow-purple-500/40 hover:from-purple-400 hover:to-pink-400',
+                    'disabled:opacity-50 disabled:cursor-not-allowed',
+                    'transition-all duration-300'
+                  )}
+                >
+                  {aiLoading ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Sparkles className="w-3.5 h-3.5" />
+                  )}
+                  {aiLoading ? 'Generating...' : '✨ AI Magic'}
+                </motion.button>
+              </div>
+              <div className="relative">
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Describe the food, its condition, and any relevant details..."
+                  rows={3}
+                  className={cn(
+                    'w-full px-4 py-3 rounded-xl bg-white/5 border text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/30 focus:ring-1 focus:ring-emerald-500/20 transition-all text-sm resize-none',
+                    aiLoading
+                      ? 'border-purple-500/30 ring-1 ring-purple-500/20'
+                      : 'border-white/10'
+                  )}
+                />
+                {/* Loading overlay on textarea */}
+                <AnimatePresence>
+                  {aiLoading && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="absolute inset-0 rounded-xl bg-purple-500/5 backdrop-blur-[1px] flex items-center justify-center"
+                    >
+                      <div className="flex items-center gap-2 text-purple-300 text-sm">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>AI is crafting your description...</span>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+              {/* AI Error message */}
+              <AnimatePresence>
+                {aiError && (
+                  <motion.p
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    className="text-xs text-red-400 mt-1.5"
+                  >
+                    {aiError}
+                  </motion.p>
+                )}
+              </AnimatePresence>
             </div>
 
             <div className="grid grid-cols-2 gap-4">

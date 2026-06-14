@@ -157,7 +157,7 @@ export default function LeaderboardPage() {
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.3 }}
         >
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:items-end mb-8">
             {top3.map((entry, i) => {
               const accent = RANK_COLORS[i];
               const RankIcon = accent.icon;
@@ -173,7 +173,7 @@ export default function LeaderboardPage() {
                     accent.bg,
                     accent.border,
                     accent.glow,
-                    i === 0 && 'sm:order-2 sm:-mt-4',
+                    i === 0 && 'sm:order-2 sm:-mt-8 sm:scale-105 sm:z-10',
                     i === 1 && 'sm:order-1',
                     i === 2 && 'sm:order-3',
                   )}

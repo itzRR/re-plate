@@ -32,7 +32,7 @@ interface TeamMember {
 const teamMembers: TeamMember[] = [
   {
     name: 'Rehan',
-    role: 'Lead Developer & Founder',
+    role: 'Backend Developer',
     description: 'Full-stack architect driving the technical vision of RePlate. Building sustainable tech for a better future.',
     photo: '/team/rehan.webp',
     video: '/team/Rehan.mp4',
@@ -148,17 +148,7 @@ function TeamCard({ member, index }: { member: TeamMember; index: number }) {
             </div>
           </motion.div>
 
-          {/* Play Indicator */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={isHovered ? { opacity: 0 } : { opacity: 1, scale: 1 }}
-            className="absolute top-4 left-4 z-10"
-          >
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-[10px] font-medium text-white/70">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              Hover to play
-            </span>
-          </motion.div>
+
 
           {/* Info at bottom of image */}
           <div className="absolute bottom-0 left-0 right-0 p-5 z-10">

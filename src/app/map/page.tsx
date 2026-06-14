@@ -167,7 +167,7 @@ export default function MapPage() {
   };
 
   return (
-    <div className="pt-16 h-screen flex flex-col overflow-hidden">
+    <div className="pt-20 h-screen flex flex-col overflow-hidden">
       {/* ── Desktop layout ───────────────────────── */}
       <div className="flex flex-1 overflow-hidden relative">
         {/* Sidebar — hidden on mobile */}
