@@ -28,13 +28,23 @@ export default function MarketplacePage() {
   const [showDietaryDropdown, setShowDietaryDropdown] = useState(false);
   const [realListings, setRealListings] = useState<FoodListing[]>([]);
   const [user, setUser] = useState<any>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const supabase = createClient();
+  const canPost = userRole && ['business', 'volunteer', 'charity'].includes(userRole);
 
   // Fetch real listings from Supabase + subscribe to realtime
   useEffect(() => {
-    // Check auth
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // Check auth + role
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setUser(session?.user || null);
+      if (session?.user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+        setUserRole(profile?.role || null);
+      }
     });
 
     const fetchListings = async () => {
@@ -181,6 +191,15 @@ export default function MarketplacePage() {
             Discover surplus food near you. Rescue meals, reduce waste, and make
             an impact.
           </p>
+          {canPost && (
+            <Link
+              href="/dashboard/post"
+              className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white text-sm font-semibold transition-colors shadow-lg shadow-emerald-500/25"
+            >
+              <Plus className="w-4 h-4" />
+              Post Surplus Food
+            </Link>
+          )}
         </motion.div>
 
         {/* ── Search Bar ── */}
@@ -495,6 +514,17 @@ export default function MarketplacePage() {
             setShowDietaryDropdown(false);
           }}
         />
+      )}
+
+      {/* Floating Action Button - Post Food */}
+      {canPost && (
+        <Link
+          href="/dashboard/post"
+          className="fixed bottom-8 right-8 z-50 flex items-center gap-2 px-6 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-500 text-white font-semibold shadow-2xl shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-105 transition-all duration-300 group"
+        >
+          <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
+          <span className="hidden sm:inline">Post Food</span>
+        </Link>
       )}
     </main>
   );
