@@ -127,7 +127,7 @@ export default function RegisterPage() {
               name: name,
               email: email,
               role: selectedRole,
-              location: location,
+              location: location.trim() || 'Colombo, Sri Lanka',
               dietary_preferences: dietaryPreferences,
             });
             
