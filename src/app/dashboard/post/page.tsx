@@ -254,7 +254,7 @@ export default function PostFoodPage() {
           <div className="w-20 h-20 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-6">
             <ShieldAlert className="w-10 h-10 text-red-400" />
           </div>
-          <h2 className="text-2xl font-bold font-[family-name:var(--font-outfit)] mb-3">
+          <h2 className="text-2xl font-bold font-heading mb-3">
             Not Authorized
           </h2>
           <p className="text-slate-400 mb-8">
@@ -280,7 +280,7 @@ export default function PostFoodPage() {
             <div className="w-20 h-20 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-6">
               <Check className="w-10 h-10 text-emerald-400" />
             </div>
-            <h2 className="text-2xl font-bold font-[family-name:var(--font-outfit)] mb-3">
+            <h2 className="text-2xl font-bold font-heading mb-3">
               Food Listed Successfully!
             </h2>
             <p className="text-slate-400 mb-8">
@@ -327,7 +327,7 @@ export default function PostFoodPage() {
             <ArrowLeft className="w-4 h-4" />
             Back to Dashboard
           </Link>
-          <h1 className="text-3xl sm:text-4xl font-bold font-[family-name:var(--font-outfit)]">
+          <h1 className="text-3xl sm:text-4xl font-bold font-heading">
             Post <span className="text-gradient">Surplus Food</span>
           </h1>
           <p className="text-slate-400 mt-2">

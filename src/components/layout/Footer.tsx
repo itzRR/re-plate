@@ -15,7 +15,7 @@ export function Footer() {
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center">
                 <Leaf className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold font-[family-name:var(--font-outfit)]">
+              <span className="text-xl font-bold font-heading">
                 Re<span className="text-gradient">Plate</span>
               </span>
             </Link>
@@ -45,7 +45,7 @@ export function Footer() {
 
           {/* Navigation */}
           <div>
-            <h3 className="text-sm font-semibold text-white mb-4 font-[family-name:var(--font-outfit)]">
+            <h3 className="text-sm font-semibold text-white mb-4 font-heading">
               Platform
             </h3>
             <ul className="space-y-3">
@@ -64,7 +64,7 @@ export function Footer() {
 
           {/* Company */}
           <div>
-            <h3 className="text-sm font-semibold text-white mb-4 font-[family-name:var(--font-outfit)]">
+            <h3 className="text-sm font-semibold text-white mb-4 font-heading">
               Company
             </h3>
             <ul className="space-y-3">
@@ -87,7 +87,7 @@ export function Footer() {
 
           {/* Legal */}
           <div>
-            <h3 className="text-sm font-semibold text-white mb-4 font-[family-name:var(--font-outfit)]">
+            <h3 className="text-sm font-semibold text-white mb-4 font-heading">
               Legal
             </h3>
             <ul className="space-y-3">
@@ -110,7 +110,7 @@ export function Footer() {
 
           {/* Newsletter */}
           <div>
-            <h3 className="text-sm font-semibold text-white mb-4 font-[family-name:var(--font-outfit)]">
+            <h3 className="text-sm font-semibold text-white mb-4 font-heading">
               Stay Updated
             </h3>
             <p className="text-sm text-slate-400 mb-4">

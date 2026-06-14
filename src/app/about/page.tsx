@@ -153,7 +153,7 @@ function TeamCard({ member, index }: { member: TeamMember; index: number }) {
           {/* Info at bottom of image */}
           <div className="absolute bottom-0 left-0 right-0 p-5 z-10">
             <motion.h3
-              className="text-xl font-bold font-[family-name:var(--font-outfit)] text-white mb-1"
+              className="text-xl font-bold font-heading text-white mb-1"
               animate={isHovered ? { y: -4 } : { y: 0 }}
               transition={{ duration: 0.3 }}
             >
@@ -204,7 +204,7 @@ export default function AboutPage() {
             initial={{ opacity: 1, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.7 }}
-            className="text-4xl sm:text-5xl md:text-6xl font-bold font-[family-name:var(--font-outfit)] leading-[1.1] tracking-tight mb-6"
+            className="text-4xl sm:text-5xl md:text-6xl font-bold font-heading leading-[1.1] tracking-tight mb-6"
           >
             We&apos;re on a Mission to{' '}
             <br className="hidden sm:block" />
@@ -251,7 +251,7 @@ export default function AboutPage() {
                 <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center mx-auto mb-5 shadow-lg shadow-emerald-500/20`}>
                   <item.icon className="w-7 h-7 text-white" />
                 </div>
-                <h3 className="text-xl font-bold font-[family-name:var(--font-outfit)] mb-3">
+                <h3 className="text-xl font-bold font-heading mb-3">
                   {item.title}
                 </h3>
                 <p className="text-sm text-slate-400 leading-relaxed">{item.desc}</p>
@@ -274,7 +274,7 @@ export default function AboutPage() {
             ].map((stat, i) => (
               <GlassCard key={stat.label} delay={i * 0.1} className="p-6 text-center">
                 <stat.icon className="w-6 h-6 text-emerald-400 mx-auto mb-3" />
-                <div className="text-2xl sm:text-3xl font-bold font-[family-name:var(--font-outfit)] text-white mb-1">
+                <div className="text-2xl sm:text-3xl font-bold font-heading text-white mb-1">
                   <AnimatedCounter end={stat.value} suffix={stat.suffix} duration={2} />
                 </div>
                 <p className="text-xs text-slate-400">{stat.label}</p>
@@ -296,7 +296,7 @@ export default function AboutPage() {
             <span className="inline-block text-emerald-400 text-sm font-semibold tracking-wider uppercase mb-3">
               The Humans Behind RePlate
             </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-[family-name:var(--font-outfit)] mb-4">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-heading mb-4">
               Meet Our <span className="text-gradient">Team</span>
             </h2>
             <p className="text-slate-400 text-lg max-w-2xl mx-auto">
@@ -323,7 +323,7 @@ export default function AboutPage() {
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-500/30">
                 <Globe className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-2xl sm:text-3xl font-bold font-[family-name:var(--font-outfit)] mb-4">
+              <h3 className="text-2xl sm:text-3xl font-bold font-heading mb-4">
                 Aligned with <span className="text-gradient">UN Sustainable Development Goals</span>
               </h3>
               <p className="text-slate-400 leading-relaxed max-w-2xl mx-auto mb-8">

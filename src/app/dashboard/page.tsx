@@ -47,7 +47,7 @@ export default function DashboardPage() {
         >
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl sm:text-4xl font-bold font-[family-name:var(--font-outfit)]">
+              <h1 className="text-3xl sm:text-4xl font-bold font-heading">
                 Dashboard
               </h1>
               <p className="text-slate-400 mt-1">Welcome back! Here&apos;s your impact summary.</p>
@@ -142,7 +142,7 @@ export default function DashboardPage() {
                       <stat.icon className={`w-5 h-5 ${stat.color}`} />
                     </div>
                   </div>
-                  <div className="text-2xl font-bold font-[family-name:var(--font-outfit)]">
+                  <div className="text-2xl font-bold font-heading">
                     <AnimatedCounter
                       end={stat.value}
                       suffix={stat.suffix}
@@ -160,7 +160,7 @@ export default function DashboardPage() {
               {/* Recent Listings */}
               <GlassCard hover={false} className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold font-[family-name:var(--font-outfit)]">
+                  <h3 className="text-lg font-semibold font-heading">
                     Recent Listings
                   </h3>
                   <Link
@@ -201,7 +201,7 @@ export default function DashboardPage() {
               <div className="space-y-6">
                 {/* Quick Actions */}
                 <GlassCard hover={false} className="p-6">
-                  <h3 className="text-lg font-semibold font-[family-name:var(--font-outfit)] mb-4">
+                  <h3 className="text-lg font-semibold font-heading mb-4">
                     Quick Actions
                   </h3>
                   <div className="grid grid-cols-2 gap-3">
@@ -229,7 +229,7 @@ export default function DashboardPage() {
 
                 {/* Recent Activity */}
                 <GlassCard hover={false} className="p-6">
-                  <h3 className="text-lg font-semibold font-[family-name:var(--font-outfit)] mb-4">
+                  <h3 className="text-lg font-semibold font-heading mb-4">
                     Recent Activity
                   </h3>
                   <div className="space-y-3">

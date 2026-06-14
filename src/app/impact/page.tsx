@@ -171,7 +171,7 @@ export default function ImpactDashboardPage() {
           transition={{ duration: 0.6 }}
           className="mb-12"
         >
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight font-[family-name:var(--font-outfit)]">
+          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight font-heading">
             <span className="bg-gradient-to-r from-emerald-400 via-green-400 to-teal-400 bg-clip-text text-transparent">
               Impact Dashboard
             </span>

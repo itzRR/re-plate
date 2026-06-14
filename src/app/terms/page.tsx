@@ -187,7 +187,7 @@ export default function TermsPage() {
               <Scale className="w-10 h-10 text-white" />
             </div>
 
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 font-[family-name:var(--font-outfit)]">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 font-heading">
               Terms & <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-green-400">Conditions</span>
             </h1>
             <p className="text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
@@ -244,7 +244,7 @@ export default function TermsPage() {
                   <section.icon className="w-6 h-6 text-emerald-400" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-white font-[family-name:var(--font-outfit)]">
+                  <h2 className="text-2xl font-bold text-white font-heading">
                     {section.title}
                   </h2>
                 </div>
@@ -276,7 +276,7 @@ export default function TermsPage() {
           transition={{ duration: 0.5 }}
           className="text-center rounded-2xl bg-gradient-to-br from-emerald-500/10 to-green-500/5 border border-emerald-500/10 p-12"
         >
-          <h2 className="text-2xl font-bold text-white mb-4 font-[family-name:var(--font-outfit)]">
+          <h2 className="text-2xl font-bold text-white mb-4 font-heading">
             Have Questions About These Terms?
           </h2>
           <p className="text-slate-400 mb-8 max-w-lg mx-auto">

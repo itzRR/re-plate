@@ -80,7 +80,7 @@ export default function ContactPage() {
               <MessageSquare className="w-10 h-10 text-white" />
             </div>
 
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 font-[family-name:var(--font-outfit)]">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 font-heading">
               Get in <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-green-400">Touch</span>
             </h1>
             <p className="text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
@@ -104,7 +104,7 @@ export default function ContactPage() {
               <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500/20 to-green-500/10 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                 <card.icon className="w-7 h-7 text-emerald-400" />
               </div>
-              <h3 className="text-white font-semibold mb-1 font-[family-name:var(--font-outfit)]">
+              <h3 className="text-white font-semibold mb-1 font-heading">
                 {card.title}
               </h3>
               <p className="text-emerald-400 text-sm font-medium mb-1">{card.detail}</p>
@@ -135,7 +135,7 @@ export default function ContactPage() {
                 <div className="w-20 h-20 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-6">
                   <CheckCircle className="w-10 h-10 text-emerald-400" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-3 font-[family-name:var(--font-outfit)]">
+                <h3 className="text-2xl font-bold text-white mb-3 font-heading">
                   Message Sent!
                 </h3>
                 <p className="text-slate-400 mb-8 max-w-sm mx-auto">
@@ -161,7 +161,7 @@ export default function ContactPage() {
                 className="space-y-6"
               >
                 <div>
-                  <h2 className="text-2xl font-bold text-white mb-2 font-[family-name:var(--font-outfit)]">
+                  <h2 className="text-2xl font-bold text-white mb-2 font-heading">
                     Send us a Message
                   </h2>
                   <p className="text-slate-400 text-sm">

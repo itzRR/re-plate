@@ -91,7 +91,7 @@ function CountingStat({ end, label, suffix }: { end: number; label: string; suff
   return (
     <div ref={ref} className="flex flex-col items-center gap-1 px-4 sm:px-6">
       <span
-        className="text-2xl sm:text-3xl font-bold font-[family-name:var(--font-outfit)]"
+        className="text-2xl sm:text-3xl font-bold font-heading"
         style={{
           background: 'linear-gradient(135deg, #34d399 0%, #6ee7b7 50%, #a7f3d0 100%)',
           WebkitBackgroundClip: 'text',
@@ -306,7 +306,7 @@ export default function HomePage() {
 
           {/* ── Kinetic Typography Headline ── */}
           <h1
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold font-[family-name:var(--font-outfit)] leading-[1.1] tracking-tight mb-6"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold font-heading leading-[1.1] tracking-tight mb-6"
             style={{ overflow: 'hidden' }}
           >
             {headlineWords.map((word, i) => (
@@ -455,7 +455,7 @@ export default function HomePage() {
             <span className="inline-block text-emerald-400 text-sm font-semibold tracking-wider uppercase mb-3">
               Simple Process
             </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-[family-name:var(--font-outfit)] mb-4">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-heading mb-4">
               How It <span className="text-gradient">Works</span>
             </h2>
             <p className="text-slate-400 text-lg max-w-2xl mx-auto">
@@ -499,7 +499,7 @@ export default function HomePage() {
                 <span className="text-xs font-bold text-emerald-500/40 tracking-widest uppercase">
                   Step {item.step}
                 </span>
-                <h3 className="text-xl font-bold font-[family-name:var(--font-outfit)] mt-2 mb-3">
+                <h3 className="text-xl font-bold font-heading mt-2 mb-3">
                   {item.title}
                 </h3>
                 <p className="text-slate-400 text-sm leading-relaxed">{item.desc}</p>
@@ -526,7 +526,7 @@ export default function HomePage() {
             <span className="inline-block text-emerald-400 text-sm font-semibold tracking-wider uppercase mb-3">
               Real Impact
             </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-[family-name:var(--font-outfit)] mb-4">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-heading mb-4">
               Our <span className="text-gradient">Collective Impact</span>
             </h2>
             <p className="text-slate-400 text-lg max-w-2xl mx-auto">
@@ -573,7 +573,7 @@ export default function HomePage() {
                 >
                   <stat.icon className="w-6 h-6 text-emerald-400" />
                 </div>
-                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold font-[family-name:var(--font-outfit)] text-white mb-1">
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold font-heading text-white mb-1">
                   <AnimatedCounter
                     end={stat.value}
                     prefix={stat.prefix || ''}
@@ -604,7 +604,7 @@ export default function HomePage() {
               <span className="inline-block text-emerald-400 text-sm font-semibold tracking-wider uppercase mb-3">
                 Available Now
               </span>
-              <h2 className="text-3xl sm:text-4xl font-bold font-[family-name:var(--font-outfit)]">
+              <h2 className="text-3xl sm:text-4xl font-bold font-heading">
                 Food Near <span className="text-gradient">You</span>
               </h2>
             </div>
@@ -640,7 +640,7 @@ export default function HomePage() {
             <span className="inline-block text-emerald-400 text-sm font-semibold tracking-wider uppercase mb-3">
               Platform Features
             </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-[family-name:var(--font-outfit)] mb-4">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-heading mb-4">
               Built for <span className="text-gradient">Impact</span>
             </h2>
           </motion.div>
@@ -689,7 +689,7 @@ export default function HomePage() {
                   <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/10 flex items-center justify-center mb-4 group-hover:bg-emerald-500/20 group-hover:border-emerald-500/20 transition-colors">
                     <feature.icon className="w-6 h-6 text-emerald-400" />
                   </div>
-                  <h3 className="text-lg font-bold font-[family-name:var(--font-outfit)] mb-2 group-hover:text-emerald-400 transition-colors">
+                  <h3 className="text-lg font-bold font-heading mb-2 group-hover:text-emerald-400 transition-colors">
                     {feature.title}
                   </h3>
                   <p className="text-sm text-slate-400 leading-relaxed">{feature.desc}</p>
@@ -718,7 +718,7 @@ export default function HomePage() {
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-500/30">
                 <Leaf className="w-8 h-8 text-white" />
               </div>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-[family-name:var(--font-outfit)] mb-4">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-heading mb-4">
                 Join the <span className="text-gradient">Movement</span>
               </h2>
               <p className="text-slate-400 text-lg max-w-xl mx-auto mb-8">

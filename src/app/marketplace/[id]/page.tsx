@@ -249,7 +249,7 @@ export default function MarketplaceDetailPage() {
               expiryTime={listing.expiry_time}
               className="mb-3"
             />
-            <h1 className="text-3xl sm:text-4xl font-bold text-white font-[family-name:var(--font-outfit)] leading-tight">
+            <h1 className="text-3xl sm:text-4xl font-bold text-white font-heading leading-tight">
               {listing.title}
             </h1>
           </div>
@@ -594,7 +594,7 @@ export default function MarketplaceDetailPage() {
             className="mt-16"
           >
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#F8FAFC] font-[family-name:var(--font-outfit)]">
+              <h2 className="text-2xl font-bold text-[#F8FAFC] font-heading">
                 More Available Food
               </h2>
               <p className="mt-1 text-[#94A3B8]">
@@ -660,7 +660,7 @@ export default function MarketplaceDetailPage() {
                   <Sparkles className="w-5 h-5 text-purple-400" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-[#F8FAFC] font-[family-name:var(--font-outfit)]">
+                  <h3 className="text-lg font-bold text-[#F8FAFC] font-heading">
                     AI Recipe Ideas
                   </h3>
                   <p className="text-xs text-[#94A3B8]">

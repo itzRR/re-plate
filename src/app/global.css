@@ -1,3 +1,4 @@
+@import url('https://api.fontshare.com/v2/css?f[]=clash-display@200,300,400,500,600,700&display=swap');
 @import "tailwindcss";
 @source "../components";
 @source "../lib";
@@ -21,7 +22,7 @@
   --color-border-hover: rgba(34, 197, 94, 0.3);
   
   /* Fonts */
-  --font-heading: var(--font-outfit);
+  --font-heading: 'Clash Display', sans-serif;
   --font-body: var(--font-inter);
 }
 
