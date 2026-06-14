@@ -4,7 +4,7 @@
    RePlate Design System - Dark Sustainability Theme
    ============================================ */
 
-@theme inline {
+@theme {
   /* Color System */
   --color-background: #0F172A;
   --color-background-secondary: #1E293B;
