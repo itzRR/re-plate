@@ -14,8 +14,9 @@ import {
 import { mockFoodListings } from '@/lib/mock-data';
 import { FOOD_CATEGORIES } from '@/lib/constants';
 import { cn } from '@/lib/utils';
-import type { FoodListing } from '@/lib/types';
+import type { FoodListing, FoodCategory } from '@/lib/types';
 import { CountdownTimer } from '@/components/ui/CountdownTimer';
+import { createClient } from '@/lib/supabase/client';
 
 // ─── Dynamically load the map (SSR disabled for Leaflet) ──────────────────────
 const MapView = dynamic(() => import('./MapView').then((m) => m.default), {
@@ -48,6 +49,52 @@ export default function MapPage() {
   const [isSearchingLocation, setIsSearchingLocation] = useState(false);
   const [showLocationResults, setShowLocationResults] = useState(false);
   const [detectedCountry, setDetectedCountry] = useState<string | null>(null);
+  const [realListings, setRealListings] = useState<FoodListing[]>([]);
+  const supabase = createClient();
+
+  // Fetch real listings from Supabase + realtime
+  useEffect(() => {
+    const fetchListings = async () => {
+      const { data } = await supabase
+        .from('food_listings')
+        .select('*, profiles:business_id (name, role, location)')
+        .eq('status', 'available')
+        .order('created_at', { ascending: false });
+
+      if (data) {
+        const mapped: FoodListing[] = data.map((item: any) => ({
+          id: item.id,
+          title: item.title,
+          description: item.description,
+          quantity: parseInt(item.quantity) || 1,
+          unit: item.unit || 'portions',
+          category: (item.category || 'other') as FoodCategory,
+          dietary_tags: item.dietary_tags || [],
+          expiry_time: item.expiry_time,
+          pickup_location: item.location,
+          pickup_lat: item.lat || 6.9271,
+          pickup_lng: item.lng || 79.8612,
+          image_url: item.image_url || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800',
+          donor_id: item.business_id,
+          donor_name: item.profiles?.name || 'Anonymous',
+          status: item.status,
+          priority_level: item.priority_level || 'normal',
+          created_at: item.created_at,
+        }));
+        setRealListings(mapped);
+      }
+    };
+    fetchListings();
+
+    const channel = supabase
+      .channel('map_food_realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'food_listings' }, () => {
+        fetchListings();
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [supabase]);
 
   // Auto-detect user location on mount
   useEffect(() => {
@@ -123,8 +170,18 @@ export default function MapPage() {
     setShowLocationResults(false);
   };
 
+  // Merge real + mock listings
+  const allListings = useMemo(() => {
+    const realIds = new Set(realListings.map(l => l.id));
+    const mockFiltered = mockFoodListings.filter(l => !realIds.has(l.id));
+    return [...realListings, ...mockFiltered];
+  }, [realListings]);
+
   const filteredListings = useMemo(() => {
-    return mockFoodListings.filter((listing) => {
+    const now = new Date().getTime();
+    return allListings.filter((listing) => {
+      // Hide expired
+      if (new Date(listing.expiry_time).getTime() <= now) return false;
       const matchesSearch =
         !searchQuery ||
         listing.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -133,7 +190,7 @@ export default function MapPage() {
       const matchesCategory = !selectedCategory || listing.category === selectedCategory;
       return matchesSearch && matchesCategory;
     });
-  }, [searchQuery, selectedCategory]);
+  }, [searchQuery, selectedCategory, allListings]);
 
   const handleNearMe = useCallback(() => {
     if (!navigator.geolocation) {

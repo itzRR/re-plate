@@ -116,7 +116,11 @@ export default function MarketplacePage() {
   }, [realListings]);
 
   const filteredListings = useMemo(() => {
+    const now = new Date().getTime();
     let results = [...allListings];
+
+    // Hide expired listings (real posts disappear when time is over)
+    results = results.filter((l) => new Date(l.expiry_time).getTime() > now);
 
     // Search filter
     if (searchQuery.trim()) {
