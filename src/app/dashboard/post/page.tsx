@@ -18,6 +18,7 @@ import {
   Loader2,
   ShieldAlert,
   X,
+  Link2,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { FOOD_CATEGORIES, DIETARY_TAGS } from '@/lib/constants';
@@ -36,6 +37,8 @@ export default function PostFoodPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [imageUrl, setImageUrl] = useState('');
+  const [showUrlInput, setShowUrlInput] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   // AI description generation state
@@ -111,6 +114,25 @@ export default function PostFoodPage() {
     setImagePreview(newPreviews[0] || null);
   };
 
+  const addImageFromUrl = () => {
+    const url = imageUrl.trim();
+    if (!url) return;
+
+    // Convert Google Drive share link to direct image URL
+    let directUrl = url;
+    const driveMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (driveMatch) {
+      directUrl = `https://drive.google.com/thumbnail?id=${driveMatch[1]}&sz=w800`;
+    }
+
+    if (imagePreviews.length < 5) {
+      setImagePreviews(prev => [...prev, directUrl]);
+      if (!imagePreview) setImagePreview(directUrl);
+    }
+    setImageUrl('');
+    setShowUrlInput(false);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -122,9 +144,16 @@ export default function PostFoodPage() {
       const expiryDate = new Date(now.getTime() + parseInt(expiryHours) * 60 * 60 * 1000);
       const pickupDate = new Date(now.getTime() + 30 * 60 * 1000); // 30 min from now
 
-      // Upload images to Supabase Storage
+      // Get image URL - either from file upload or pasted URL
       let imageUrl = null;
-      if (imageFiles.length > 0) {
+      
+      // Check if first preview is a pasted URL (not a data: URI)
+      const firstPreview = imagePreviews[0] || null;
+      if (firstPreview && !firstPreview.startsWith('data:')) {
+        // It's a pasted URL, use it directly
+        imageUrl = firstPreview;
+      } else if (imageFiles.length > 0) {
+        // Upload file to Supabase Storage
         const file = imageFiles[0];
         const fileExt = file.name.split('.').pop();
         const fileName = `${user.id}/${Date.now()}.${fileExt}`;
@@ -310,11 +339,11 @@ export default function PostFoodPage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Image Upload - Google Drive Style */}
           <GlassCard hover={false} delay={0.1} className="p-6">
-            <label className="flex items-center gap-2 text-sm font-semibold mb-4">
+            <div className="flex items-center gap-2 text-sm font-semibold mb-4">
               <ImageIcon className="w-4 h-4 text-emerald-400" />
               Food Photos
               <span className="text-xs text-slate-500 font-normal ml-auto">{imagePreviews.length}/5 photos</span>
-            </label>
+            </div>
 
             {/* Thumbnail Grid */}
             {imagePreviews.length > 0 && (
@@ -330,6 +359,7 @@ export default function PostFoodPage() {
                       src={preview}
                       alt={`Photo ${index + 1}`}
                       className="w-full h-full object-cover"
+                      onError={(e) => { (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect fill="%23334155" width="100" height="100"/><text x="50" y="55" text-anchor="middle" fill="%2394a3b8" font-size="12">No preview</text></svg>'; }}
                     />
                     {index === 0 && (
                       <span className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-md bg-emerald-500/90 text-[10px] font-bold text-white">
@@ -366,24 +396,99 @@ export default function PostFoodPage() {
 
             {/* Empty upload state */}
             {imagePreviews.length === 0 && (
-              <label className="block cursor-pointer">
-                <div className="aspect-video rounded-xl border-2 border-dashed border-white/10 hover:border-emerald-500/30 flex flex-col items-center justify-center gap-3 transition-colors">
-                  <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                    <Upload className="w-6 h-6 text-emerald-400" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                {/* Upload from device */}
+                <label className="block cursor-pointer">
+                  <div className="aspect-[4/3] rounded-xl border-2 border-dashed border-white/10 hover:border-emerald-500/30 flex flex-col items-center justify-center gap-3 transition-colors">
+                    <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                      <Upload className="w-6 h-6 text-emerald-400" />
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm font-medium">Upload from device</p>
+                      <p className="text-xs text-slate-500 mt-1">PNG, JPG up to 5MB</p>
+                    </div>
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                </label>
+
+                {/* Paste URL */}
+                <button
+                  type="button"
+                  onClick={() => setShowUrlInput(true)}
+                  className="aspect-[4/3] rounded-xl border-2 border-dashed border-white/10 hover:border-sky-500/30 flex flex-col items-center justify-center gap-3 transition-colors"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-sky-500/10 flex items-center justify-center">
+                    <Link2 className="w-6 h-6 text-sky-400" />
                   </div>
                   <div className="text-center">
-                    <p className="text-sm font-medium">Click to upload photos</p>
-                    <p className="text-xs text-slate-500 mt-1">PNG, JPG up to 5MB - Max 5 photos</p>
+                    <p className="text-sm font-medium">Paste image URL</p>
+                    <p className="text-xs text-slate-500 mt-1">Google Drive, Imgur, etc.</p>
                   </div>
-                </div>
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleImageChange}
-                  className="hidden"
-                />
-              </label>
+                </button>
+              </div>
+            )}
+
+            {/* URL Input */}
+            <AnimatePresence>
+              {showUrlInput && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="flex gap-2 mt-2">
+                    <div className="relative flex-1">
+                      <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                      <input
+                        type="url"
+                        value={imageUrl}
+                        onChange={(e) => setImageUrl(e.target.value)}
+                        placeholder="Paste image URL or Google Drive link..."
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-500 focus:outline-none focus:border-sky-500/30 focus:ring-1 focus:ring-sky-500/20 transition-all text-sm"
+                        onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addImageFromUrl())}
+                        autoFocus
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={addImageFromUrl}
+                      disabled={!imageUrl.trim()}
+                      className="px-4 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-sm font-medium transition-colors disabled:opacity-40"
+                    >
+                      Add
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setShowUrlInput(false); setImageUrl(''); }}
+                      className="px-3 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 text-sm transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-2 ml-1">
+                    Supports: Direct image links, Google Drive share links, Imgur, Unsplash
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Add URL button when thumbnails exist */}
+            {imagePreviews.length > 0 && imagePreviews.length < 5 && !showUrlInput && (
+              <button
+                type="button"
+                onClick={() => setShowUrlInput(true)}
+                className="flex items-center gap-2 text-xs text-sky-400 hover:text-sky-300 transition-colors mt-2"
+              >
+                <Link2 className="w-3.5 h-3.5" />
+                Or paste an image URL
+              </button>
             )}
           </GlassCard>
 
