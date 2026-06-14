@@ -71,14 +71,14 @@ export function Navbar() {
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden lg:flex items-center gap-1">
+          <div className="hidden lg:flex items-center gap-0.5">
             {NAV_LINKS.map((link) => {
               const isActive = pathname === link.href;
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className={`relative px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                     isActive
                       ? 'text-emerald-400'
                       : 'text-slate-300 hover:text-white'
@@ -87,7 +87,7 @@ export function Navbar() {
                   {isActive && (
                     <motion.div
                       layoutId="navbar-indicator"
-                      className="absolute inset-0 bg-emerald-500/10 rounded-lg border border-emerald-500/20"
+                      className="absolute inset-0 bg-emerald-500/10 rounded-lg"
                       transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                     />
                   )}
