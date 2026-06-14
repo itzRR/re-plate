@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { Leaf, Heart, ExternalLink, MessageCircle, Mail } from 'lucide-react';
 import { NAV_LINKS } from '@/lib/constants';
