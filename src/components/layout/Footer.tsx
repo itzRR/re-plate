@@ -8,7 +8,7 @@ export function Footer() {
   return (
     <footer className="relative border-t border-white/5 bg-[#0B1120]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
@@ -62,24 +62,49 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Resources */}
+          {/* Company */}
           <div>
             <h3 className="text-sm font-semibold text-white mb-4 font-[family-name:var(--font-outfit)]">
-              Resources
+              Company
             </h3>
             <ul className="space-y-3">
-              {['How It Works', 'For Businesses', 'For Charities', 'For Volunteers', 'API Docs'].map(
-                (item) => (
-                  <li key={item}>
-                    <Link
-                      href="#"
-                      className="text-sm text-slate-400 hover:text-emerald-400 transition-colors"
-                    >
-                      {item}
-                    </Link>
-                  </li>
-                )
-              )}
+              {[
+                { label: 'About', href: '/about' },
+                { label: 'Contact', href: '/contact' },
+                { label: 'Blog', href: '#' },
+              ].map((item) => (
+                <li key={item.label}>
+                  <Link
+                    href={item.href}
+                    className="text-sm text-slate-400 hover:text-emerald-400 transition-colors"
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Legal */}
+          <div>
+            <h3 className="text-sm font-semibold text-white mb-4 font-[family-name:var(--font-outfit)]">
+              Legal
+            </h3>
+            <ul className="space-y-3">
+              {[
+                { label: 'Privacy Policy', href: '/privacy' },
+                { label: 'Terms & Conditions', href: '/terms' },
+                { label: 'Cookie Policy', href: '/privacy#cookies' },
+              ].map((item) => (
+                <li key={item.label}>
+                  <Link
+                    href={item.href}
+                    className="text-sm text-slate-400 hover:text-emerald-400 transition-colors"
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 

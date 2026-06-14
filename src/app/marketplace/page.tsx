@@ -1,13 +1,15 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, SlidersHorizontal, ChevronDown, Leaf, X } from 'lucide-react';
+import { Search, SlidersHorizontal, ChevronDown, Leaf, X, Plus } from 'lucide-react';
+import Link from 'next/link';
 import { FoodCard } from '@/components/food/FoodCard';
 import { mockFoodListings } from '@/lib/mock-data';
 import { FOOD_CATEGORIES, DIETARY_TAGS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
-import type { FoodCategory, DietaryTag } from '@/lib/types';
+import { createClient } from '@/lib/supabase/client';
+import type { FoodCategory, DietaryTag, FoodListing } from '@/lib/types';
 
 type SortOption = 'expiring' | 'newest' | 'quantity';
 
@@ -24,6 +26,65 @@ export default function MarketplacePage() {
   const [sortBy, setSortBy] = useState<SortOption>('expiring');
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showDietaryDropdown, setShowDietaryDropdown] = useState(false);
+  const [realListings, setRealListings] = useState<FoodListing[]>([]);
+  const [user, setUser] = useState<any>(null);
+  const supabase = createClient();
+
+  // Fetch real listings from Supabase + subscribe to realtime
+  useEffect(() => {
+    // Check auth
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user || null);
+    });
+
+    const fetchListings = async () => {
+      const { data } = await supabase
+        .from('food_listings')
+        .select(`
+          *,
+          profiles:business_id (name, role, location)
+        `)
+        .eq('status', 'available')
+        .order('created_at', { ascending: false });
+
+      if (data) {
+        const mapped: FoodListing[] = data.map((item: any) => ({
+          id: item.id,
+          title: item.title,
+          description: item.description,
+          quantity: parseInt(item.quantity) || 1,
+          unit: item.unit || 'portions',
+          category: item.category as FoodCategory,
+          dietary_tags: item.dietary_tags || [],
+          expiry_time: item.expiry_time,
+          pickup_location: item.location,
+          pickup_lat: item.lat || 6.9271,
+          pickup_lng: item.lng || 79.8612,
+          image_url: item.image_url || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800',
+          donor_id: item.business_id,
+          donor_name: item.profiles?.name || 'Anonymous',
+          status: item.status,
+          priority_level: item.priority_level || 'normal',
+          created_at: item.created_at,
+        }));
+        setRealListings(mapped);
+      }
+    };
+
+    fetchListings();
+
+    // Realtime subscription
+    const channel = supabase
+      .channel('food_listings_realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'food_listings' }, () => {
+        fetchListings(); // Re-fetch on any change
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [supabase]);
 
   const toggleCategory = (cat: FoodCategory) => {
     setActiveCategories((prev) =>
@@ -37,8 +98,15 @@ export default function MarketplacePage() {
     );
   };
 
+  // Merge real listings (first) with mock listings as fallback
+  const allListings = useMemo(() => {
+    const realIds = new Set(realListings.map(l => l.id));
+    const mockFiltered = mockFoodListings.filter(l => !realIds.has(l.id));
+    return [...realListings, ...mockFiltered];
+  }, [realListings]);
+
   const filteredListings = useMemo(() => {
-    let results = [...mockFoodListings];
+    let results = [...allListings];
 
     // Search filter
     if (searchQuery.trim()) {

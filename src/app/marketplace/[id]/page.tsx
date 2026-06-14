@@ -1,7 +1,7 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useMemo, useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'motion/react';
@@ -25,6 +25,7 @@ import { cn, formatTimeRemaining } from '@/lib/utils';
 import { CountdownTimer } from '@/components/ui/CountdownTimer';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { FoodCard } from '@/components/food/FoodCard';
+import { createClient } from '@/lib/supabase/client';
 
 const dietaryColors: Record<string, string> = {
   vegetarian: 'bg-green-500/15 text-green-400 border-green-500/20',
@@ -67,6 +68,45 @@ export default function MarketplaceDetailPage() {
   const [recipeSuggestions, setRecipeSuggestions] = useState<RecipeSuggestion[] | null>(null);
   const [recipeError, setRecipeError] = useState<string | null>(null);
   const [showRecipeModal, setShowRecipeModal] = useState(false);
+
+  // Claim state
+  const [user, setUser] = useState<any>(null);
+  const [claimLoading, setClaimLoading] = useState(false);
+  const [claimed, setClaimed] = useState(false);
+  const [claimError, setClaimError] = useState<string | null>(null);
+  const router = useRouter();
+  const supabase = createClient();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user || null);
+    });
+  }, [supabase]);
+
+  const handleClaim = async () => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+    if (!listing) return;
+    setClaimLoading(true);
+    setClaimError(null);
+
+    try {
+      const { error } = await supabase
+        .from('food_listings')
+        .update({ status: 'claimed', claimed_by: user.id })
+        .eq('id', listing.id)
+        .eq('status', 'available');
+
+      if (error) throw error;
+      setClaimed(true);
+    } catch (err: any) {
+      setClaimError(err.message || 'Failed to claim this listing');
+    } finally {
+      setClaimLoading(false);
+    }
+  };
 
   const fetchRecipeSuggestions = async () => {
     if (!listing) return;
@@ -393,22 +433,36 @@ export default function MarketplaceDetailPage() {
               )}
             >
               <button
+                onClick={handleClaim}
+                disabled={claimLoading || claimed}
                 className={cn(
                   'w-full relative rounded-xl py-4 px-6 mb-3',
-                  'bg-gradient-to-r from-emerald-500 to-green-500',
+                  claimed
+                    ? 'bg-gradient-to-r from-sky-500 to-blue-500'
+                    : 'bg-gradient-to-r from-emerald-500 to-green-500',
                   'text-white font-semibold text-base',
-                  'shadow-[0_0_30px_rgba(34,197,94,0.3)]',
-                  'hover:shadow-[0_0_50px_rgba(34,197,94,0.5)]',
-                  'hover:from-emerald-400 hover:to-green-400',
+                  claimed
+                    ? 'shadow-[0_0_30px_rgba(56,189,248,0.3)]'
+                    : 'shadow-[0_0_30px_rgba(34,197,94,0.3)]',
+                  !claimed && 'hover:shadow-[0_0_50px_rgba(34,197,94,0.5)]',
+                  !claimed && 'hover:from-emerald-400 hover:to-green-400',
                   'transition-all duration-300',
-                  'active:scale-[0.98]'
+                  'active:scale-[0.98]',
+                  'disabled:opacity-70'
                 )}
               >
                 <span className="relative z-10 flex items-center justify-center gap-2">
-                  <Leaf className="w-5 h-5" />
-                  Claim This Food
+                  {claimLoading ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <Leaf className="w-5 h-5" />
+                  )}
+                  {claimed ? '✓ Claimed Successfully!' : claimLoading ? 'Claiming...' : user ? 'Claim This Food' : 'Log In to Claim'}
                 </span>
               </button>
+              {claimError && (
+                <p className="text-red-400 text-xs text-center mb-3">{claimError}</p>
+              )}
 
               <button
                 className={cn(

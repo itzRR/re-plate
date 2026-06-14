@@ -1,9 +1,9 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion, useScroll, useTransform } from 'motion/react';
+import { motion, useScroll, useTransform, useMotionValue, useSpring, useInView } from 'motion/react';
 import {
   ArrowRight,
   Leaf,
@@ -20,6 +20,161 @@ import { AnimatedCounter } from '@/components/ui/AnimatedCounter';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { FoodCard } from '@/components/food/FoodCard';
 import { mockFoodListings, mockImpactMetrics } from '@/lib/mock-data';
+
+/* ── Floating Food Emoji Component ── */
+function FloatingEmoji({ emoji, index }: { emoji: string; index: number }) {
+  const randomX = 10 + (index * 13) % 80;
+  const randomY = 10 + ((index * 17 + 7) % 70);
+  const size = 24 + (index % 3) * 12;
+  const duration = 12 + (index % 5) * 3;
+  const delay = index * 0.6;
+  const depth = 0.3 + (index % 4) * 0.2;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0 }}
+      animate={{ opacity: depth, scale: 1 }}
+      transition={{ delay: 1 + delay, duration: 0.6, type: 'spring' }}
+      style={{
+        position: 'absolute',
+        left: `${randomX}%`,
+        top: `${randomY}%`,
+        fontSize: `${size}px`,
+        zIndex: 1,
+        filter: `blur(${(1 - depth) * 2}px)`,
+        pointerEvents: 'none' as const,
+      }}
+    >
+      <motion.span
+        animate={{
+          y: [0, -20 * depth, 5 * depth, -15 * depth, 0],
+          x: [0, 10 * depth, -8 * depth, 12 * depth, 0],
+          rotate: [0, 10, -5, 8, 0],
+        }}
+        transition={{
+          duration: duration,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        }}
+        style={{ display: 'inline-block' }}
+      >
+        {emoji}
+      </motion.span>
+    </motion.div>
+  );
+}
+
+/* ── Counting Stat Component ── */
+function CountingStat({ end, label, suffix }: { end: number; label: string; suffix: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true });
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!isInView) return;
+    let start = 0;
+    const stepTime = 40;
+    const steps = 50;
+    const increment = end / steps;
+    const timer = setInterval(() => {
+      start += increment;
+      if (start >= end) {
+        setCount(end);
+        clearInterval(timer);
+      } else {
+        setCount(Math.floor(start));
+      }
+    }, stepTime);
+    return () => clearInterval(timer);
+  }, [isInView, end]);
+
+  return (
+    <div ref={ref} className="flex flex-col items-center gap-1 px-4 sm:px-6">
+      <span
+        className="text-2xl sm:text-3xl font-bold font-[family-name:var(--font-outfit)]"
+        style={{
+          background: 'linear-gradient(135deg, #34d399 0%, #6ee7b7 50%, #a7f3d0 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+        }}
+      >
+        {count.toLocaleString()}{suffix}
+      </span>
+      <span className="text-xs sm:text-sm text-slate-500 whitespace-nowrap">{label}</span>
+    </div>
+  );
+}
+
+/* ── Magnetic CTA Button ── */
+function MagneticCTA({ children, href }: { children: React.ReactNode; href: string }) {
+  const ref = useRef<HTMLAnchorElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const springX = useSpring(x, { stiffness: 300, damping: 20 });
+  const springY = useSpring(y, { stiffness: 300, damping: 20 });
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
+    const rect = ref.current?.getBoundingClientRect();
+    if (!rect) return;
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    x.set((e.clientX - centerX) * 0.15);
+    y.set((e.clientY - centerY) * 0.15);
+  }, [x, y]);
+
+  const handleMouseLeave = useCallback(() => {
+    x.set(0);
+    y.set(0);
+  }, [x, y]);
+
+  return (
+    <motion.a
+      ref={ref}
+      href={href}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{ x: springX, y: springY, position: 'relative', display: 'inline-flex' }}
+      className="btn-primary text-base w-full sm:w-auto"
+      whileTap={{ scale: 0.97 }}
+    >
+      {/* Glowing pulse ring */}
+      <motion.span
+        style={{
+          position: 'absolute',
+          inset: '-4px',
+          borderRadius: '14px',
+          background: 'linear-gradient(135deg, rgba(52,211,153,0.4), rgba(16,185,129,0.1))',
+          zIndex: -1,
+          pointerEvents: 'none' as const,
+        }}
+        animate={{ opacity: [0.4, 0.8, 0.4], scale: [1, 1.06, 1] }}
+        transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+      />
+      <span
+        className="flex items-center justify-center gap-2"
+        style={{ padding: '14px 32px' }}
+      >
+        <Search className="w-5 h-5" />
+        {children}
+        <ArrowRight className="w-4 h-4" />
+      </span>
+    </motion.a>
+  );
+}
+
+/* ── Food Emojis Data ── */
+const floatingEmojis = ['🍞', '🥗', '🍕', '🍎', '🥑', '🍰', '🥕', '🍜'];
+
+/* ── Headline Words ── */
+const headlineWords = [
+  { text: 'Rescue', gradient: false },
+  { text: 'Food.', gradient: false },
+  { text: 'Feed', gradient: true },
+  { text: 'Communities.', gradient: true },
+  { text: 'Save', gradient: false },
+  { text: 'the', gradient: false },
+  { text: 'Planet.', gradient: false },
+];
 
 export default function HomePage() {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -41,75 +196,182 @@ export default function HomePage() {
         ref={heroRef}
         className="relative min-h-[calc(100vh-72px)] flex items-center justify-center overflow-hidden"
       >
-        {/* Animated Background Orbs */}
-        <div className="floating-orb floating-orb-1" />
-        <div className="floating-orb floating-orb-2" />
-        <div className="floating-orb floating-orb-3" />
-
-        {/* Grid Pattern */}
+        {/* ── Animated Gradient Mesh Background ── */}
         <div
-          className="absolute inset-0 opacity-[0.03]"
           style={{
-            backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-                             linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
-            backgroundSize: '60px 60px',
+            position: 'absolute',
+            inset: 0,
+            zIndex: 0,
+            overflow: 'hidden',
           }}
-        />
+        >
+          {/* Primary mesh layer */}
+          <motion.div
+            animate={{
+              backgroundPosition: ['0% 0%', '100% 100%', '50% 0%', '0% 50%', '0% 0%'],
+            }}
+            transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
+            style={{
+              position: 'absolute',
+              inset: '-50%',
+              width: '200%',
+              height: '200%',
+              background: `
+                radial-gradient(ellipse at 20% 50%, rgba(16,185,129,0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(52,211,153,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 40% 80%, rgba(5,150,105,0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 60%, rgba(110,231,183,0.06) 0%, transparent 40%)
+              `,
+              backgroundSize: '100% 100%',
+            }}
+          />
+          {/* Secondary morph layer */}
+          <motion.div
+            animate={{
+              backgroundPosition: ['100% 100%', '0% 0%', '50% 100%', '100% 50%', '100% 100%'],
+            }}
+            transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
+            style={{
+              position: 'absolute',
+              inset: '-30%',
+              width: '160%',
+              height: '160%',
+              background: `
+                radial-gradient(circle at 60% 30%, rgba(20,184,166,0.07) 0%, transparent 45%),
+                radial-gradient(circle at 30% 70%, rgba(34,197,94,0.06) 0%, transparent 45%)
+              `,
+              backgroundSize: '100% 100%',
+            }}
+          />
+          {/* Subtle noise texture overlay */}
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              opacity: 0.03,
+              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E")`,
+              backgroundSize: '128px 128px',
+            }}
+          />
+        </div>
 
+        {/* ── Floating Food Emojis ── */}
+        {floatingEmojis.map((emoji, i) => (
+          <FloatingEmoji key={i} emoji={emoji} index={i} />
+        ))}
+
+        {/* ── Main Hero Content ── */}
         <motion.div
           style={{ y: heroY, opacity: heroOpacity }}
           className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
         >
-          {/* Badge */}
+          {/* ── Shimmer Badge ── */}
           <motion.div
-            initial={{ opacity: 1, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-medium mb-8"
+            initial={{ opacity: 0, y: 20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ delay: 0.1, type: 'spring', stiffness: 200, damping: 20 }}
+            style={{ position: 'relative', display: 'inline-flex', overflow: 'hidden' }}
+            className="items-center gap-2 px-5 py-2.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-medium mb-10"
           >
+            {/* Shimmer sweep */}
+            <motion.span
+              animate={{ x: ['-100%', '200%'] }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', repeatDelay: 2 }}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '50%',
+                height: '100%',
+                background: 'linear-gradient(90deg, transparent, rgba(52,211,153,0.15), transparent)',
+                pointerEvents: 'none' as const,
+              }}
+            />
             <Sparkles className="w-4 h-4" />
             <span>Reducing Food Waste, One Meal at a Time</span>
           </motion.div>
 
-          {/* Main Headline */}
-          <motion.h1
-            initial={{ opacity: 1, y: 0 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.7 }}
+          {/* ── Kinetic Typography Headline ── */}
+          <h1
             className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold font-[family-name:var(--font-outfit)] leading-[1.1] tracking-tight mb-6"
+            style={{ overflow: 'hidden' }}
           >
-            Rescue Food.{' '}
-            <br className="hidden sm:block" />
-            <span className="text-gradient">Feed Communities.</span>
-            <br />
-            Save the Planet.
-          </motion.h1>
+            {headlineWords.map((word, i) => (
+              <motion.span
+                key={i}
+                initial={{ opacity: 0, y: 60, rotateX: -40 }}
+                animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                transition={{
+                  delay: 0.3 + i * 0.12,
+                  type: 'spring',
+                  stiffness: 100,
+                  damping: 14,
+                }}
+                style={{
+                  display: 'inline-block',
+                  marginRight: '0.3em',
+                  ...(word.gradient
+                    ? {
+                        background: 'linear-gradient(135deg, #34d399, #6ee7b7, #a7f3d0)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                      }
+                    : {}),
+                }}
+              >
+                {word.text}
+                {/* Line breaks after specific words */}
+                {(i === 1) && <br className="hidden sm:block" />}
+                {(i === 3) && <br />}
+              </motion.span>
+            ))}
+          </h1>
 
-          {/* Subtitle */}
+          {/* ── Subtitle ── */}
           <motion.p
-            initial={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="max-w-2xl mx-auto text-lg sm:text-xl text-slate-400 leading-relaxed mb-10"
+            transition={{ delay: 1.2, duration: 0.7 }}
+            className="max-w-2xl mx-auto text-lg sm:text-xl text-slate-400 leading-relaxed mb-8"
           >
             Connecting surplus food from restaurants, bakeries, and stores with
             charities, students, and families who need it — before it becomes waste.
           </motion.p>
 
-          {/* CTA Buttons */}
+          {/* ── Animated Stats Bar ── */}
           <motion.div
-            initial={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
+            transition={{ delay: 1.5, duration: 0.6 }}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              background: 'rgba(255,255,255,0.03)',
+              border: '1px solid rgba(255,255,255,0.06)',
+              borderRadius: '16px',
+              padding: '16px 8px',
+              backdropFilter: 'blur(12px)',
+              gap: '0',
+              marginBottom: '32px',
+            }}
+          >
+            <CountingStat end={42500} label="Meals Rescued" suffix="" />
+            <div style={{ width: '1px', height: '32px', background: 'rgba(255,255,255,0.08)' }} />
+            <CountingStat end={12400} label="kg CO₂ Saved" suffix="" />
+            <div style={{ width: '1px', height: '32px', background: 'rgba(255,255,255,0.08)' }} />
+            <CountingStat end={890} label="Partners" suffix="+" />
+          </motion.div>
+
+          {/* ── CTA Buttons ── */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.8, duration: 0.5 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
-            <Link href="/marketplace" className="btn-primary text-base !px-8 !py-3.5 w-full sm:w-auto">
-              <span className="flex items-center justify-center gap-2">
-                <Search className="w-5 h-5" />
-                Find Food Near You
-                <ArrowRight className="w-4 h-4" />
-              </span>
-            </Link>
+            <MagneticCTA href="/marketplace">
+              Find Food Near You
+            </MagneticCTA>
             <Link
               href="/register"
               className="btn-secondary text-base !px-8 !py-3.5 w-full sm:w-auto flex items-center justify-center gap-2"
@@ -119,39 +381,49 @@ export default function HomePage() {
             </Link>
           </motion.div>
 
-          {/* Trust Indicators */}
+          {/* ── Trust Indicators ── */}
           <motion.div
-            initial={{ opacity: 1 }}
+            initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.7 }}
+            transition={{ delay: 2.2, duration: 0.8 }}
             className="mt-12 flex flex-wrap items-center justify-center gap-6 text-sm text-slate-500"
           >
             {[
               { icon: ShieldCheck, text: '100% Free Platform' },
               { icon: Users, text: '2,500+ Active Users' },
               { icon: Store, text: '180+ Partner Businesses' },
-            ].map((item) => (
-              <div key={item.text} className="flex items-center gap-2">
+            ].map((item, idx) => (
+              <motion.div
+                key={item.text}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 2.3 + idx * 0.15 }}
+                className="flex items-center gap-2"
+              >
                 <item.icon className="w-4 h-4 text-emerald-500/60" />
                 <span>{item.text}</span>
-              </div>
+              </motion.div>
             ))}
           </motion.div>
         </motion.div>
 
-        {/* Scroll Indicator */}
+        {/* ── Scroll Indicator ── */}
         <motion.div
-          initial={{ opacity: 1 }}
+          initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.2 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
+          transition={{ delay: 2.8 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
         >
           <motion.div
             animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
             className="w-6 h-10 rounded-full border-2 border-white/10 flex items-start justify-center p-1.5"
           >
-            <motion.div className="w-1.5 h-3 bg-emerald-400 rounded-full" />
+            <motion.div
+              animate={{ height: ['12px', '6px', '12px'], opacity: [1, 0.5, 1] }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              className="w-1.5 bg-emerald-400 rounded-full"
+            />
           </motion.div>
         </motion.div>
       </section>

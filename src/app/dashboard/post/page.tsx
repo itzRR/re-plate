@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   ArrowLeft,
@@ -15,10 +16,12 @@ import {
   Image as ImageIcon,
   Sparkles,
   Loader2,
+  ShieldAlert,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { FOOD_CATEGORIES, DIETARY_TAGS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
+import { createClient } from '@/lib/supabase/client';
 
 export default function PostFoodPage() {
   const [title, setTitle] = useState('');
@@ -36,6 +39,35 @@ export default function PostFoodPage() {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
 
+  // Auth state
+  const [authChecking, setAuthChecking] = useState(true);
+  const [user, setUser] = useState<any>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const router = useRouter();
+  const supabase = createClient();
+
+  // Check auth on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.push('/login');
+        return;
+      }
+      setUser(session.user);
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', session.user.id)
+        .single();
+      setUserRole(profile?.role || null);
+      setAuthChecking(false);
+    };
+    checkAuth();
+  }, [router, supabase]);
+
   const toggleTag = (tag: string) => {
     setSelectedTags((prev) =>
       prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
@@ -51,9 +83,41 @@ export default function PostFoodPage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    if (!user) return;
+    setSubmitLoading(true);
+    setSubmitError(null);
+
+    try {
+      const now = new Date();
+      const expiryDate = new Date(now.getTime() + parseInt(expiryHours) * 60 * 60 * 1000);
+      const pickupDate = new Date(now.getTime() + 30 * 60 * 1000); // 30 min from now
+
+      const { error } = await supabase.from('food_listings').insert({
+        business_id: user.id,
+        title,
+        description,
+        category,
+        quantity,
+        unit,
+        dietary_tags: selectedTags,
+        image_url: imagePreview || null,
+        priority_level: parseInt(expiryHours) <= 4 ? 'urgent' : parseInt(expiryHours) <= 8 ? 'high' : 'normal',
+        pickup_time: pickupDate.toISOString(),
+        expiry_time: expiryDate.toISOString(),
+        location: pickupLocation,
+        status: 'available',
+      });
+
+      if (error) throw error;
+      setSubmitted(true);
+    } catch (err: any) {
+      console.error('Post error:', err);
+      setSubmitError(err.message || 'Failed to post food listing');
+    } finally {
+      setSubmitLoading(false);
+    }
   };
 
   const generateAIDescription = async () => {
@@ -94,6 +158,37 @@ export default function PostFoodPage() {
       setAiLoading(false);
     }
   };
+
+  // Auth loading state
+  if (authChecking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  // Block public users
+  if (userRole === 'public') {
+    return (
+      <div className="min-h-screen pt-24 pb-16 px-4 flex items-center justify-center">
+        <GlassCard hover={false} className="p-12 max-w-md mx-auto text-center">
+          <div className="w-20 h-20 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-6">
+            <ShieldAlert className="w-10 h-10 text-red-400" />
+          </div>
+          <h2 className="text-2xl font-bold font-[family-name:var(--font-outfit)] mb-3">
+            Not Authorized
+          </h2>
+          <p className="text-slate-400 mb-8">
+            Only Business, Volunteer, and Charity accounts can post food listings. You are logged in as a Public user.
+          </p>
+          <Link href="/marketplace" className="btn-primary text-sm text-center inline-block">
+            <span>Browse Marketplace Instead</span>
+          </Link>
+        </GlassCard>
+      </div>
+    );
+  }
 
   if (submitted) {
     return (
@@ -424,6 +519,17 @@ export default function PostFoodPage() {
           </GlassCard>
 
           {/* Submit */}
+          {/* Submit Error */}
+          {submitError && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center mb-4"
+            >
+              {submitError}
+            </motion.div>
+          )}
+
           <motion.div
             initial={{ opacity: 1, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -436,10 +542,18 @@ export default function PostFoodPage() {
             >
               Cancel
             </Link>
-            <button type="submit" className="btn-primary flex-1 text-sm">
+            <button
+              type="submit"
+              disabled={submitLoading}
+              className="btn-primary flex-1 text-sm disabled:opacity-50"
+            >
               <span className="flex items-center justify-center gap-2">
-                <Upload className="w-4 h-4" />
-                Post Food Listing
+                {submitLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Upload className="w-4 h-4" />
+                )}
+                {submitLoading ? 'Posting...' : 'Post Food Listing'}
               </span>
             </button>
           </motion.div>
