@@ -18,8 +18,10 @@ import {
   EyeOff,
 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { DIETARY_TAGS } from '@/lib/constants';
+import { createClient } from '@/lib/supabase/client';
 
 // ─── Role options ─────────────────────────────────────────────────────────────
 const ROLES = [
@@ -76,6 +78,9 @@ export default function RegisterPage() {
   const [location, setLocation] = useState('');
   const [dietaryPreferences, setDietaryPreferences] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const supabase = createClient();
 
   const toggleDietary = (value: string) => {
     setDietaryPreferences((prev) =>
@@ -89,13 +94,54 @@ export default function RegisterPage() {
     return true;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    
     if (step < 2) {
       setStep((s) => s + 1);
     } else {
       setIsLoading(true);
-      setTimeout(() => setIsLoading(false), 1500);
+      
+      try {
+        // 1. Sign up the user in Supabase Auth
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              full_name: name,
+              role: selectedRole,
+            }
+          }
+        });
+
+        if (authError) throw authError;
+        
+        if (authData.user) {
+          // 2. Insert into public.profiles
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .insert({
+              id: authData.user.id,
+              name: name,
+              email: email,
+              role: selectedRole,
+              location: location,
+              dietary_preferences: dietaryPreferences,
+            });
+            
+          if (profileError) throw profileError;
+          
+          // 3. Redirect to profile
+          router.push('/profile');
+        }
+      } catch (err: any) {
+        console.error('Registration error:', err);
+        setError(err.message || 'An error occurred during registration.');
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -400,6 +446,17 @@ export default function RegisterPage() {
                 </motion.div>
               )}
             </AnimatePresence>
+
+            {/* Error Message */}
+            {error && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }} 
+                animate={{ opacity: 1, y: 0 }} 
+                className="mt-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center"
+              >
+                {error}
+              </motion.div>
+            )}
 
             {/* ── Navigation buttons ───────────── */}
             <div className="flex gap-3 mt-8">

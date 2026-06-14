@@ -4,7 +4,9 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Leaf, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { createClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -12,12 +14,33 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const supabase = createClient();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     setIsLoading(true);
-    // UI-only — fake loading
-    setTimeout(() => setIsLoading(false), 1500);
+    
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+      
+      if (data.user) {
+        router.push('/profile');
+        router.refresh();
+      }
+    } catch (err: any) {
+      console.error('Login error:', err);
+      setError(err.message || 'Invalid login credentials');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -163,6 +186,17 @@ export default function LoginPage() {
               </span>
             </button>
           </form>
+
+          {/* Error Message */}
+          {error && (
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }} 
+              animate={{ opacity: 1, y: 0 }} 
+              className="mt-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center"
+            >
+              {error}
+            </motion.div>
+          )}
 
           {/* Divider */}
           <div className="flex items-center gap-4 my-7">

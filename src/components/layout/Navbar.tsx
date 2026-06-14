@@ -4,13 +4,16 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
-import { Menu, X, Leaf, LogIn, UserPlus } from 'lucide-react';
+import { Menu, X, Leaf, LogIn, UserPlus, LogOut, User } from 'lucide-react';
 import { NAV_LINKS } from '@/lib/constants';
+import { createClient } from '@/lib/supabase/client';
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [user, setUser] = useState<any>(null);
   const pathname = usePathname();
+  const supabase = createClient();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -22,6 +25,24 @@ export function Navbar() {
     // eslint-disable-next-line
     setIsOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user || null);
+    };
+    checkSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [supabase]);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+  };
 
   return (
     <header
@@ -78,22 +99,43 @@ export function Navbar() {
 
           {/* Auth Buttons */}
           <div className="hidden lg:flex items-center gap-3">
-            <Link
-              href="/login"
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors"
-            >
-              <LogIn className="w-4 h-4" />
-              Log In
-            </Link>
-            <Link
-              href="/register"
-              className="btn-primary flex items-center gap-2 text-sm !py-2 !px-4"
-            >
-              <span className="flex items-center gap-2">
-                <UserPlus className="w-4 h-4" />
-                Sign Up
-              </span>
-            </Link>
+            {user ? (
+              <>
+                <Link
+                  href="/profile"
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors"
+                >
+                  <User className="w-4 h-4" />
+                  Profile
+                </Link>
+                <button
+                  onClick={handleSignOut}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-400 hover:text-red-300 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors"
+                >
+                  <LogIn className="w-4 h-4" />
+                  Log In
+                </Link>
+                <Link
+                  href="/register"
+                  className="btn-primary flex items-center gap-2 text-sm !py-2 !px-4"
+                >
+                  <span className="flex items-center gap-2">
+                    <UserPlus className="w-4 h-4" />
+                    Sign Up
+                  </span>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -141,22 +183,43 @@ export function Navbar() {
                 );
               })}
               <div className="pt-4 mt-4 border-t border-white/5 flex flex-col gap-2">
-                <Link
-                  href="/login"
-                  className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 transition-colors"
-                >
-                  <LogIn className="w-4 h-4" />
-                  Log In
-                </Link>
-                <Link
-                  href="/register"
-                  className="btn-primary text-center text-sm !py-3"
-                >
-                  <span className="flex items-center justify-center gap-2">
-                    <UserPlus className="w-4 h-4" />
-                    Sign Up Free
-                  </span>
-                </Link>
+                {user ? (
+                  <>
+                    <Link
+                      href="/profile"
+                      className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 transition-colors"
+                    >
+                      <User className="w-4 h-4" />
+                      Profile
+                    </Link>
+                    <button
+                      onClick={handleSignOut}
+                      className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 transition-colors"
+                    >
+                      <LogIn className="w-4 h-4" />
+                      Log In
+                    </Link>
+                    <Link
+                      href="/register"
+                      className="btn-primary text-center text-sm !py-3"
+                    >
+                      <span className="flex items-center justify-center gap-2">
+                        <UserPlus className="w-4 h-4" />
+                        Sign Up Free
+                      </span>
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </motion.div>
