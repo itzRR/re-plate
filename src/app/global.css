@@ -1,5 +1,6 @@
 @import "tailwindcss";
-
+@source "../components";
+@source "../lib";
 /* ============================================
    RePlate Design System - Dark Sustainability Theme
    ============================================ */
