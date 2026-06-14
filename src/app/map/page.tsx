@@ -39,8 +39,8 @@ export default function MapPage() {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
 
   // Start with a world view, auto-detect later
-  const [mapCenter, setMapCenter] = useState<[number, number]>([20, 0]);
-  const [mapZoom, setMapZoom] = useState(3);
+  const [mapCenter, setMapCenter] = useState<[number, number]>([6.9271, 79.8612]);
+  const [mapZoom, setMapZoom] = useState(13);
 
   // Location search state
   const [locationSearch, setLocationSearch] = useState('');
@@ -167,7 +167,7 @@ export default function MapPage() {
   };
 
   return (
-    <div className="pt-20 h-screen flex flex-col overflow-hidden">
+    <div className="h-screen flex flex-col overflow-hidden">
       {/* ── Desktop layout ───────────────────────── */}
       <div className="flex flex-1 overflow-hidden relative">
         {/* Sidebar — hidden on mobile */}

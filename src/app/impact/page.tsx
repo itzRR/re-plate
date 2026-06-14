@@ -162,7 +162,7 @@ const statCards = [
 // ─── Page Component ──────────────────────────────────────────────────────────────
 export default function ImpactDashboardPage() {
   return (
-    <main className="min-h-screen bg-[#0F172A] pt-24 pb-20">
+    <main className="min-h-screen bg-[#0F172A] pb-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* ── Header ── */}
         <motion.div

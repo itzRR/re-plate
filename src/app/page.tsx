@@ -39,7 +39,7 @@ export default function HomePage() {
           ============================================ */}
       <section
         ref={heroRef}
-        className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16"
+        className="relative min-h-[calc(100vh-72px)] flex items-center justify-center overflow-hidden"
       >
         {/* Animated Background Orbs */}
         <div className="floating-orb floating-orb-1" />

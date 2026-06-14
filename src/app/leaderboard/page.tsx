@@ -78,7 +78,7 @@ export default function LeaderboardPage() {
   };
 
   return (
-    <div className="pt-24 pb-20 px-4 sm:px-6 max-w-6xl mx-auto">
+    <div className="pb-20 px-4 sm:px-6 max-w-6xl mx-auto">
       {/* ── Header ──────────────────────────────── */}
       <motion.div
         initial={{ opacity: 1, y: 20 }}

@@ -21,7 +21,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="pt-24 min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
       {/* ── Animated floating orbs ──────────────── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div
