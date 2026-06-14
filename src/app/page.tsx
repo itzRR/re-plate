@@ -178,6 +178,19 @@ const headlineWords = [
 
 export default function HomePage() {
   const heroRef = useRef<HTMLDivElement>(null);
+  const [user, setUser] = useState<any>(null);
+  
+  useEffect(() => {
+    const fetchUser = async () => {
+      // Need to dynamically import createClient for client components
+      const { createClient } = await import('@/lib/supabase/client');
+      const supabase = createClient();
+      const { data } = await supabase.auth.getUser();
+      setUser(data.user);
+    };
+    fetchUser();
+  }, []);
+
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ['start start', 'end start'],
@@ -373,7 +386,7 @@ export default function HomePage() {
               Find Food Near You
             </MagneticCTA>
             <Link
-              href="/register"
+              href={user ? "/dashboard/post" : "/register"}
               className="btn-secondary text-base !px-8 !py-3.5 w-full sm:w-auto flex items-center justify-center gap-2"
             >
               <Store className="w-5 h-5" />
