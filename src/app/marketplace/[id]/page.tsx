@@ -1,10 +1,10 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import {
   ArrowLeft,
   MapPin,
@@ -15,6 +15,9 @@ import {
   Navigation,
   Leaf,
   AlertTriangle,
+  Sparkles,
+  Loader2,
+  X,
 } from 'lucide-react';
 import { mockFoodListings } from '@/lib/mock-data';
 import { FOOD_CATEGORIES, DIETARY_TAGS } from '@/lib/constants';
@@ -32,6 +35,12 @@ const dietaryColors: Record<string, string> = {
   'dairy-free': 'bg-cyan-500/15 text-cyan-400 border-cyan-500/20',
   'nut-free': 'bg-orange-500/15 text-orange-400 border-orange-500/20',
 };
+
+interface RecipeSuggestion {
+  emoji: string;
+  title: string;
+  description: string;
+}
 
 export default function MarketplaceDetailPage() {
   const params = useParams();
@@ -52,6 +61,47 @@ export default function MarketplaceDetailPage() {
   const categoryConfig = listing
     ? FOOD_CATEGORIES.find((c) => c.value === listing.category)
     : null;
+
+  // AI Recipe Suggestions state
+  const [recipeLoading, setRecipeLoading] = useState(false);
+  const [recipeSuggestions, setRecipeSuggestions] = useState<RecipeSuggestion[] | null>(null);
+  const [recipeError, setRecipeError] = useState<string | null>(null);
+  const [showRecipeModal, setShowRecipeModal] = useState(false);
+
+  const fetchRecipeSuggestions = async () => {
+    if (!listing) return;
+
+    setRecipeLoading(true);
+    setRecipeError(null);
+    setShowRecipeModal(true);
+
+    try {
+      const res = await fetch('/api/ai/suggest-recipes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: listing.title,
+          description: listing.description,
+          category: listing.category,
+          dietary_tags: listing.dietary_tags,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to get recipe suggestions');
+      }
+
+      setRecipeSuggestions(data.suggestions);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'Something went wrong';
+      setRecipeError(message);
+    } finally {
+      setRecipeLoading(false);
+    }
+  };
 
   // ── 404 Not Found ──
   if (!listing) {
@@ -362,7 +412,7 @@ export default function MarketplaceDetailPage() {
 
               <button
                 className={cn(
-                  'w-full rounded-xl py-3.5 px-6',
+                  'w-full rounded-xl py-3.5 px-6 mb-3',
                   'bg-white/[0.05] backdrop-blur-md',
                   'border border-white/[0.1]',
                   'text-[#94A3B8] font-medium text-sm',
@@ -374,6 +424,35 @@ export default function MarketplaceDetailPage() {
                 <Navigation className="w-4 h-4" />
                 Get Directions
               </button>
+
+              {/* AI Recipe Ideas Button */}
+              <motion.button
+                onClick={fetchRecipeSuggestions}
+                disabled={recipeLoading}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className={cn(
+                  'w-full relative rounded-xl py-3.5 px-6',
+                  'bg-gradient-to-r from-purple-600/20 to-pink-600/20',
+                  'backdrop-blur-md',
+                  'border border-purple-500/20',
+                  'text-purple-300 font-medium text-sm',
+                  'hover:from-purple-600/30 hover:to-pink-600/30',
+                  'hover:border-purple-500/30 hover:text-purple-200',
+                  'disabled:opacity-50 disabled:cursor-not-allowed',
+                  'transition-all duration-300',
+                  'flex items-center justify-center gap-2',
+                  'shadow-lg shadow-purple-500/10',
+                  'hover:shadow-purple-500/20'
+                )}
+              >
+                {recipeLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Sparkles className="w-4 h-4" />
+                )}
+                {recipeLoading ? 'Generating Ideas...' : '✨ AI Recipe Ideas'}
+              </motion.button>
             </motion.div>
 
             {/* Donor Info Card */}
@@ -477,6 +556,156 @@ export default function MarketplaceDetailPage() {
           </motion.section>
         )}
       </div>
+
+      {/* ── AI Recipe Suggestions Modal ── */}
+      <AnimatePresence>
+        {showRecipeModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            onClick={() => setShowRecipeModal(false)}
+          >
+            {/* Backdrop */}
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+
+            {/* Modal */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ duration: 0.3, type: 'spring', damping: 25 }}
+              onClick={(e) => e.stopPropagation()}
+              className={cn(
+                'relative w-full max-w-lg',
+                'rounded-2xl p-6',
+                'bg-[#1E293B]/90 backdrop-blur-2xl',
+                'border border-white/[0.1]',
+                'shadow-2xl shadow-purple-500/10',
+                'max-h-[85vh] overflow-y-auto'
+              )}
+            >
+              {/* Close button */}
+              <button
+                onClick={() => setShowRecipeModal(false)}
+                className={cn(
+                  'absolute top-4 right-4 p-2 rounded-xl',
+                  'bg-white/[0.05] border border-white/[0.08]',
+                  'text-slate-400 hover:text-white hover:bg-white/[0.1]',
+                  'transition-all duration-200'
+                )}
+              >
+                <X className="w-4 h-4" />
+              </button>
+
+              {/* Header */}
+              <div className="flex items-center gap-3 mb-6">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/20">
+                  <Sparkles className="w-5 h-5 text-purple-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-[#F8FAFC] font-[family-name:var(--font-outfit)]">
+                    AI Recipe Ideas
+                  </h3>
+                  <p className="text-xs text-[#94A3B8]">
+                    Creative ways to enjoy {listing.title}
+                  </p>
+                </div>
+              </div>
+
+              {/* Loading State */}
+              {recipeLoading && (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="relative">
+                    <div className="w-12 h-12 rounded-full border-2 border-purple-500/20 border-t-purple-400 animate-spin" />
+                    <Sparkles className="w-5 h-5 text-purple-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                  </div>
+                  <p className="text-sm text-[#94A3B8] mt-4">
+                    AI is cooking up ideas...
+                  </p>
+                </div>
+              )}
+
+              {/* Error State */}
+              {recipeError && !recipeLoading && (
+                <div className="text-center py-8">
+                  <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-3">
+                    <AlertTriangle className="w-6 h-6 text-red-400" />
+                  </div>
+                  <p className="text-sm text-red-400 mb-4">{recipeError}</p>
+                  <button
+                    onClick={fetchRecipeSuggestions}
+                    className={cn(
+                      'px-4 py-2 rounded-xl text-sm font-medium',
+                      'bg-white/[0.05] border border-white/[0.1]',
+                      'text-[#94A3B8] hover:text-white hover:bg-white/[0.1]',
+                      'transition-all duration-200'
+                    )}
+                  >
+                    Try Again
+                  </button>
+                </div>
+              )}
+
+              {/* Suggestions */}
+              {recipeSuggestions && !recipeLoading && (
+                <div className="space-y-4">
+                  {recipeSuggestions.map((suggestion, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, y: 15 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.35, delay: idx * 0.1 }}
+                      className={cn(
+                        'rounded-xl p-4',
+                        'bg-white/[0.04] backdrop-blur-md',
+                        'border border-white/[0.06]',
+                        'hover:bg-white/[0.07] hover:border-white/[0.12]',
+                        'transition-all duration-300',
+                        'group'
+                      )}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/15 text-xl group-hover:scale-110 transition-transform duration-300">
+                          {suggestion.emoji}
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="text-sm font-semibold text-[#F8FAFC] mb-1">
+                            {suggestion.title}
+                          </h4>
+                          <p className="text-sm text-[#94A3B8] leading-relaxed">
+                            {suggestion.description}
+                          </p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+
+                  {/* Dietary note */}
+                  {listing.dietary_tags.length > 0 && (
+                    <div className="flex items-center gap-2 pt-2 px-1">
+                      <Leaf className="w-3.5 h-3.5 text-emerald-400/60 shrink-0" />
+                      <p className="text-xs text-[#64748B]">
+                        All suggestions respect{' '}
+                        {listing.dietary_tags
+                          .map(
+                            (t) =>
+                              DIETARY_TAGS.find((dt) => dt.value === t)
+                                ?.label ?? t
+                          )
+                          .join(', ')}{' '}
+                        dietary requirements
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }
