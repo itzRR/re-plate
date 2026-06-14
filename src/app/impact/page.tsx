@@ -69,6 +69,7 @@ const topBusinessesData = [
 ];
 
 // ─── Custom Tooltip ─────────────────────────────────────────────────────────────
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload || payload.length === 0) return null;
   return (
@@ -81,6 +82,7 @@ function CustomTooltip({ active, payload, label }: any) {
       )}
     >
       <p className="text-sm font-medium text-white mb-1.5">{label}</p>
+      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
       {payload.map((entry: any, i: number) => (
         <p key={i} className="text-xs text-slate-300">
           <span
@@ -94,6 +96,7 @@ function CustomTooltip({ active, payload, label }: any) {
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function PieTooltip({ active, payload }: any) {
   if (!active || !payload || payload.length === 0) return null;
   const data = payload[0];

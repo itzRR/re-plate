@@ -19,6 +19,7 @@ export function Navbar() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line
     setIsOpen(false);
   }, [pathname]);
 
