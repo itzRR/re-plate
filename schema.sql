@@ -94,3 +94,28 @@ ALTER PUBLICATION supabase_realtime ADD TABLE public.food_listings;
 -- ALTER TABLE public.food_listings ADD CONSTRAINT food_listings_priority_level_check CHECK (priority_level IN ('normal', 'high', 'urgent'));
 -- DROP POLICY IF EXISTS "Businesses can create listings" ON public.food_listings;
 -- CREATE POLICY "Authorized roles can create listings" ON public.food_listings FOR INSERT WITH CHECK (auth.uid() = business_id AND EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('business', 'volunteer', 'charity')));
+
+-- ========================================================================================
+-- 4. STORAGE BUCKET FOR FOOD IMAGES
+-- Run this in Supabase SQL Editor, or create manually in Dashboard > Storage
+-- ========================================================================================
+INSERT INTO storage.buckets (id, name, public) VALUES ('food-images', 'food-images', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Allow authenticated users to upload images
+CREATE POLICY "Authenticated users can upload food images"
+ON storage.objects FOR INSERT
+TO authenticated
+WITH CHECK (bucket_id = 'food-images');
+
+-- Allow public read access to food images
+CREATE POLICY "Public can view food images"
+ON storage.objects FOR SELECT
+TO public
+USING (bucket_id = 'food-images');
+
+-- Allow users to delete their own images
+CREATE POLICY "Users can delete own food images"
+ON storage.objects FOR DELETE
+TO authenticated
+USING (bucket_id = 'food-images' AND (storage.foldername(name))[1] = auth.uid()::text);

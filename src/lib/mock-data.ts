@@ -194,7 +194,7 @@ export const mockFoodListings: FoodListing[] = [
     id: 'fl-009',
     title: 'Organic Vegetable Medley',
     description:
-      'Assorted organic vegetables — carrots, beans, bell peppers, and spinach. Great for meal prep.',
+      'Assorted organic vegetables - carrots, beans, bell peppers, and spinach. Great for meal prep.',
     quantity: 8,
     unit: 'kg',
     category: 'fruits-vegetables',

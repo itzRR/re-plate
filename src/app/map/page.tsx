@@ -72,14 +72,14 @@ export default function MapPage() {
             .catch(() => {});
         },
         () => {
-          // Geolocation denied or unavailable — stay at world view
+          // Geolocation denied or unavailable - stay at world view
         },
         { timeout: 5000, enableHighAccuracy: false }
       );
     }
   }, []);
 
-  // Search for locations globally using Nominatim (OpenStreetMap geocoding — free, no API key)
+  // Search for locations globally using Nominatim (OpenStreetMap geocoding - free, no API key)
   const searchLocation = useCallback(async (query: string) => {
     if (!query.trim()) {
       setLocationResults([]);
@@ -170,7 +170,7 @@ export default function MapPage() {
     <div className="h-screen flex flex-col overflow-hidden">
       {/* ── Desktop layout ───────────────────────── */}
       <div className="flex flex-1 overflow-hidden relative">
-        {/* Sidebar — hidden on mobile */}
+        {/* Sidebar - hidden on mobile */}
         <aside className="hidden lg:flex flex-col w-[350px] shrink-0 border-r border-white/[0.06] bg-[#0F172A]/80 backdrop-blur-xl z-10">
           {/* Header */}
           <div className="p-4 border-b border-white/[0.06] space-y-3">

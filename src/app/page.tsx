@@ -163,7 +163,7 @@ function MagneticCTA({ children, href }: { children: React.ReactNode; href: stri
 }
 
 /* ── Food Emojis Data ── */
-const floatingEmojis = ['🍞', '🥗', '🍕', '🍎', '🥑', '🍰', '🥕', '🍜'];
+const floatingEmojis = ['🍞', '�-', '🍕', '🍎', '🥑', '🍰', '🥕', '🍜'];
 
 /* ── Headline Words ── */
 const headlineWords = [
@@ -335,7 +335,7 @@ export default function HomePage() {
             className="max-w-2xl mx-auto text-lg sm:text-xl text-slate-400 leading-relaxed mb-8"
           >
             Connecting surplus food from restaurants, bakeries, and stores with
-            charities, students, and families who need it — before it becomes waste.
+            charities, students, and families who need it - before it becomes waste.
           </motion.p>
 
           {/* ── Animated Stats Bar ── */}
@@ -643,7 +643,7 @@ export default function HomePage() {
               {
                 icon: BarChart3,
                 title: 'Carbon Impact Dashboard',
-                desc: 'Track your environmental impact — food rescued, CO₂ saved, and meals provided with beautiful charts.',
+                desc: 'Track your environmental impact - food rescued, CO₂ saved, and meals provided with beautiful charts.',
                 href: '/impact',
               },
               {
@@ -667,7 +667,7 @@ export default function HomePage() {
               {
                 icon: Truck,
                 title: 'Volunteer Delivery',
-                desc: 'Can\'t pick up? Volunteers can deliver food to you — like Uber for Good.',
+                desc: 'Can\'t pick up? Volunteers can deliver food to you - like Uber for Good.',
                 href: '/register',
               },
             ].map((feature, i) => (
@@ -710,7 +710,7 @@ export default function HomePage() {
               </h2>
               <p className="text-slate-400 text-lg max-w-xl mx-auto mb-8">
                 Whether you&apos;re a business with surplus food, a charity in need, or a volunteer
-                ready to help — there&apos;s a place for you on RePlate.
+                ready to help - there&apos;s a place for you on RePlate.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link href="/register" className="btn-primary text-base !px-8 !py-3.5 w-full sm:w-auto">

@@ -59,12 +59,12 @@ export function FoodCard({ listing, index = 0 }: FoodCardProps) {
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A]/80 via-transparent to-transparent" />
 
-        {/* Status badge — top right */}
+        {/* Status badge - top right */}
         <div className="absolute top-3 right-3 z-10">
           <StatusBadge status={listing.status} />
         </div>
 
-        {/* Category badge — top left */}
+        {/* Category badge - top left */}
         {categoryConfig && (
           <div className="absolute top-3 left-3 z-10">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 px-2.5 py-1 text-xs font-medium text-white/90">

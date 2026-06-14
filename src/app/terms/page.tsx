@@ -96,7 +96,7 @@ const sections = [
       },
       {
         subtitle: 'Community Standards',
-        text: 'All users are expected to honor their commitments — show up for scheduled pickups, respond to messages promptly, and maintain accurate listings. Repeated no-shows or unresponsiveness may affect your account standing.',
+        text: 'All users are expected to honor their commitments - show up for scheduled pickups, respond to messages promptly, and maintain accurate listings. Repeated no-shows or unresponsiveness may affect your account standing.',
       },
     ],
   },

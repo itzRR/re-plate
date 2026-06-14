@@ -17,6 +17,7 @@ import {
   Sparkles,
   Loader2,
   ShieldAlert,
+  X,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { FOOD_CATEGORIES, DIETARY_TAGS } from '@/lib/constants';
@@ -33,6 +34,8 @@ export default function PostFoodPage() {
   const [expiryHours, setExpiryHours] = useState('6');
   const [pickupLocation, setPickupLocation] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
 
   // AI description generation state
@@ -75,12 +78,37 @@ export default function PostFoodPage() {
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    
+    const newFiles = [...imageFiles, ...files].slice(0, 5); // Max 5 images
+    setImageFiles(newFiles);
+    
+    // Generate previews
+    newFiles.forEach((file, index) => {
       const reader = new FileReader();
-      reader.onloadend = () => setImagePreview(reader.result as string);
+      reader.onloadend = () => {
+        setImagePreviews(prev => {
+          const updated = [...prev];
+          updated[index] = reader.result as string;
+          return updated.slice(0, newFiles.length);
+        });
+      };
       reader.readAsDataURL(file);
-    }
+    });
+
+    // Set first image as main preview
+    const reader = new FileReader();
+    reader.onloadend = () => setImagePreview(reader.result as string);
+    reader.readAsDataURL(newFiles[0]);
+  };
+
+  const removeImage = (index: number) => {
+    const newFiles = imageFiles.filter((_, i) => i !== index);
+    const newPreviews = imagePreviews.filter((_, i) => i !== index);
+    setImageFiles(newFiles);
+    setImagePreviews(newPreviews);
+    setImagePreview(newPreviews[0] || null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -94,6 +122,27 @@ export default function PostFoodPage() {
       const expiryDate = new Date(now.getTime() + parseInt(expiryHours) * 60 * 60 * 1000);
       const pickupDate = new Date(now.getTime() + 30 * 60 * 1000); // 30 min from now
 
+      // Upload images to Supabase Storage
+      let imageUrl = null;
+      if (imageFiles.length > 0) {
+        const file = imageFiles[0];
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('food-images')
+          .upload(fileName, file, { cacheControl: '3600', upsert: false });
+        
+        if (uploadError) {
+          console.warn('Image upload failed, using placeholder:', uploadError.message);
+        } else {
+          const { data: urlData } = supabase.storage
+            .from('food-images')
+            .getPublicUrl(fileName);
+          imageUrl = urlData.publicUrl;
+        }
+      }
+
       const { error } = await supabase.from('food_listings').insert({
         business_id: user.id,
         title,
@@ -102,7 +151,7 @@ export default function PostFoodPage() {
         quantity,
         unit,
         dietary_tags: selectedTags,
-        image_url: imagePreview || null,
+        image_url: imageUrl,
         priority_level: parseInt(expiryHours) <= 4 ? 'urgent' : parseInt(expiryHours) <= 8 ? 'high' : 'normal',
         pickup_time: pickupDate.toISOString(),
         expiry_time: expiryDate.toISOString(),
@@ -259,42 +308,83 @@ export default function PostFoodPage() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Image Upload */}
+          {/* Image Upload - Google Drive Style */}
           <GlassCard hover={false} delay={0.1} className="p-6">
             <label className="flex items-center gap-2 text-sm font-semibold mb-4">
               <ImageIcon className="w-4 h-4 text-emerald-400" />
-              Food Photo
+              Food Photos
+              <span className="text-xs text-slate-500 font-normal ml-auto">{imagePreviews.length}/5 photos</span>
             </label>
-            <label className="block cursor-pointer">
-              {imagePreview ? (
-                <div className="relative aspect-video rounded-xl overflow-hidden border border-white/10">
-                  <img
-                    src={imagePreview}
-                    alt="Preview"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                    <span className="text-sm font-medium">Change Photo</span>
-                  </div>
-                </div>
-              ) : (
+
+            {/* Thumbnail Grid */}
+            {imagePreviews.length > 0 && (
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 mb-4">
+                {imagePreviews.map((preview, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="relative aspect-square rounded-xl overflow-hidden border border-white/10 group"
+                  >
+                    <img
+                      src={preview}
+                      alt={`Photo ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                    {index === 0 && (
+                      <span className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-md bg-emerald-500/90 text-[10px] font-bold text-white">
+                        Cover
+                      </span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500/80"
+                    >
+                      <X className="w-3.5 h-3.5 text-white" />
+                    </button>
+                    <div className="absolute inset-0 ring-2 ring-transparent group-hover:ring-emerald-500/40 rounded-xl transition-all" />
+                  </motion.div>
+                ))}
+
+                {/* Add more button */}
+                {imagePreviews.length < 5 && (
+                  <label className="aspect-square rounded-xl border-2 border-dashed border-white/10 hover:border-emerald-500/30 flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors">
+                    <Upload className="w-5 h-5 text-slate-500" />
+                    <span className="text-[10px] text-slate-500">Add</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleImageChange}
+                      className="hidden"
+                    />
+                  </label>
+                )}
+              </div>
+            )}
+
+            {/* Empty upload state */}
+            {imagePreviews.length === 0 && (
+              <label className="block cursor-pointer">
                 <div className="aspect-video rounded-xl border-2 border-dashed border-white/10 hover:border-emerald-500/30 flex flex-col items-center justify-center gap-3 transition-colors">
                   <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
                     <Upload className="w-6 h-6 text-emerald-400" />
                   </div>
                   <div className="text-center">
-                    <p className="text-sm font-medium">Click to upload a photo</p>
-                    <p className="text-xs text-slate-500 mt-1">PNG, JPG up to 5MB</p>
+                    <p className="text-sm font-medium">Click to upload photos</p>
+                    <p className="text-xs text-slate-500 mt-1">PNG, JPG up to 5MB - Max 5 photos</p>
                   </div>
                 </div>
-              )}
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="hidden"
-              />
-            </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+              </label>
+            )}
           </GlassCard>
 
           {/* Basic Info */}

@@ -237,7 +237,7 @@ export default function AboutPage() {
               {
                 icon: Globe,
                 title: 'Our Vision',
-                desc: 'A world where no edible food goes to waste — where every meal finds its way to someone who needs it.',
+                desc: 'A world where no edible food goes to waste - where every meal finds its way to someone who needs it.',
                 color: 'from-green-500 to-teal-500',
               },
               {

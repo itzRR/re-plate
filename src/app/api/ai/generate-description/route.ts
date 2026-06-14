@@ -30,7 +30,7 @@ The description should:
 - Mention freshness or quality where appropriate
 - Encourage someone to claim the food before it goes to waste
 - Be concise and suitable for a food rescue marketplace listing
-- Do NOT include the title, quantity, or category in the description — just the description text itself
+- Do NOT include the title, quantity, or category in the description - just the description text itself
 
 Respond with ONLY the description text, no quotes, no labels, no extra formatting.`;
 
