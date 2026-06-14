@@ -80,9 +80,15 @@ DO $$ BEGIN
   END IF;
 END $$;
 
--- 3. Set up Realtime
-ALTER PUBLICATION supabase_realtime ADD TABLE public.profiles;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.food_listings;
+-- 3. Set up Realtime (safe for re-runs)
+DO $$ BEGIN
+  ALTER PUBLICATION supabase_realtime ADD TABLE public.profiles;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  ALTER PUBLICATION supabase_realtime ADD TABLE public.food_listings;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 -- ========================================================================================
 -- IF YOU ALREADY RAN SCHEMA v1, run these ALTER statements instead of the full script:

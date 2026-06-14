@@ -163,7 +163,7 @@ function MagneticCTA({ children, href }: { children: React.ReactNode; href: stri
 }
 
 /* ── Food Emojis Data ── */
-const floatingEmojis = ['🍞', '�-', '🍕', '🍎', '🥑', '🍰', '🥕', '🍜'];
+const floatingEmojis = ['\u{1F35E}', '\u{1F957}', '\u{1F355}', '\u{1F34E}', '\u{1F951}', '\u{1F370}', '\u{1F955}', '\u{1F35C}'];
 
 /* ── Headline Words ── */
 const headlineWords = [
