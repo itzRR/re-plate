@@ -81,7 +81,7 @@ export default function LeaderboardPage() {
     <div className="pt-24 pb-20 px-4 sm:px-6 max-w-6xl mx-auto">
       {/* ── Header ──────────────────────────────── */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 1, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-12"
       >
@@ -152,7 +152,7 @@ export default function LeaderboardPage() {
       <AnimatePresence mode="wait">
         <motion.div
           key={activeTab}
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 1, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.3 }}
@@ -164,7 +164,7 @@ export default function LeaderboardPage() {
               return (
                 <motion.div
                   key={entry.id}
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={{ opacity: 1, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.12, duration: 0.5 }}
                   className={cn(
@@ -225,7 +225,7 @@ export default function LeaderboardPage() {
                 {rest.map((entry, i) => (
                   <motion.div
                     key={entry.id}
-                    initial={{ opacity: 0, x: -20 }}
+                    initial={{ opacity: 1, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.3 + i * 0.05 }}
                     className="flex items-center gap-4 p-4 hover:bg-white/[0.02] transition-colors"

@@ -99,7 +99,7 @@ function TeamCard({ member, index }: { member: TeamMember; index: number }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 40 }}
+      initial={{ opacity: 1, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-50px' }}
       transition={{ duration: 0.6, delay: index * 0.12, ease: 'easeOut' }}
@@ -168,7 +168,7 @@ function TeamCard({ member, index }: { member: TeamMember; index: number }) {
             </motion.p>
             <motion.p
               className="text-xs text-slate-400 mt-2 leading-relaxed line-clamp-2"
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 1, y: 10 }}
               animate={isHovered ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
               transition={{ duration: 0.3, delay: 0.1 }}
             >
@@ -191,7 +191,7 @@ export default function AboutPage() {
 
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 1, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-medium mb-8"
@@ -201,7 +201,7 @@ export default function AboutPage() {
           </motion.div>
 
           <motion.h1
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 1, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.7 }}
             className="text-4xl sm:text-5xl md:text-6xl font-bold font-[family-name:var(--font-outfit)] leading-[1.1] tracking-tight mb-6"
@@ -212,7 +212,7 @@ export default function AboutPage() {
           </motion.h1>
 
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 1, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
             className="max-w-2xl mx-auto text-lg text-slate-400 leading-relaxed"
@@ -288,7 +288,7 @@ export default function AboutPage() {
       <section className="section-padding relative">
         <div className="max-w-7xl mx-auto">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 1, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-center mb-16"

@@ -41,7 +41,7 @@ export default function DashboardPage() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 1, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
@@ -66,7 +66,7 @@ export default function DashboardPage() {
 
         {/* Tab Navigation */}
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 1, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className="flex gap-1 p-1 rounded-xl bg-white/[0.03] border border-white/[0.06] w-fit mb-8"
@@ -95,7 +95,7 @@ export default function DashboardPage() {
         {/* Overview Tab */}
         {activeTab === 'overview' && (
           <motion.div
-            initial={{ opacity: 0 }}
+            initial={{ opacity: 1 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
           >
@@ -257,7 +257,7 @@ export default function DashboardPage() {
         {/* Listings Tab */}
         {activeTab === 'listings' && (
           <motion.div
-            initial={{ opacity: 0 }}
+            initial={{ opacity: 1 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
           >
@@ -297,7 +297,7 @@ export default function DashboardPage() {
         {/* Notifications Tab */}
         {activeTab === 'notifications' && (
           <motion.div
-            initial={{ opacity: 0 }}
+            initial={{ opacity: 1 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
           >

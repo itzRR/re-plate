@@ -99,7 +99,7 @@ export default function MarketplacePage() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* ── Header ── */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 1, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           className="mb-10"
@@ -117,7 +117,7 @@ export default function MarketplacePage() {
 
         {/* ── Search Bar ── */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 1, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
           className="mb-6"
@@ -152,7 +152,7 @@ export default function MarketplacePage() {
 
         {/* ── Category Filters ── */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 1, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.15 }}
           className="mb-4"
@@ -187,7 +187,7 @@ export default function MarketplacePage() {
 
         {/* ── Sort & Dietary Filter Row ── */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 1, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
           className="mb-8 flex flex-wrap items-center justify-between gap-3"
@@ -227,7 +227,7 @@ export default function MarketplacePage() {
               <AnimatePresence>
                 {showDietaryDropdown && (
                   <motion.div
-                    initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                    initial={{ opacity: 1, y: -8, scale: 0.96 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -8, scale: 0.96 }}
                     transition={{ duration: 0.2 }}
@@ -314,7 +314,7 @@ export default function MarketplacePage() {
               <AnimatePresence>
                 {showSortDropdown && (
                   <motion.div
-                    initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                    initial={{ opacity: 1, y: -8, scale: 0.96 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -8, scale: 0.96 }}
                     transition={{ duration: 0.2 }}
@@ -350,7 +350,7 @@ export default function MarketplacePage() {
             {/* Clear all */}
             {activeFilterCount > 0 && (
               <motion.button
-                initial={{ opacity: 0, scale: 0.8 }}
+                initial={{ opacity: 1, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
                 onClick={clearAllFilters}
@@ -381,7 +381,7 @@ export default function MarketplacePage() {
         ) : (
           /* ── Empty State ── */
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 1, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             className="flex flex-col items-center justify-center py-24 text-center"

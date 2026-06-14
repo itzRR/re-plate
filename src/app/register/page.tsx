@@ -119,7 +119,7 @@ export default function RegisterPage() {
 
       {/* ── Card ───────────────────────────────── */}
       <motion.div
-        initial={{ opacity: 0, y: 30, scale: 0.97 }}
+        initial={{ opacity: 1, y: 30, scale: 0.97 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         className="relative z-10 w-full max-w-lg"
@@ -187,7 +187,7 @@ export default function RegisterPage() {
               {step === 0 && (
                 <motion.div
                   key="step-0"
-                  initial={{ opacity: 0, x: 40 }}
+                  initial={{ opacity: 1, x: 40 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -40 }}
                   transition={{ duration: 0.3 }}
@@ -238,7 +238,7 @@ export default function RegisterPage() {
               {step === 1 && (
                 <motion.div
                   key="step-1"
-                  initial={{ opacity: 0, x: 40 }}
+                  initial={{ opacity: 1, x: 40 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -40 }}
                   transition={{ duration: 0.3 }}
@@ -332,7 +332,7 @@ export default function RegisterPage() {
               {step === 2 && (
                 <motion.div
                   key="step-2"
-                  initial={{ opacity: 0, x: 40 }}
+                  initial={{ opacity: 1, x: 40 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -40 }}
                   transition={{ duration: 0.3 }}

@@ -166,7 +166,7 @@ export default function ImpactDashboardPage() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* ── Header ── */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 1, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           className="mb-12"
@@ -220,7 +220,7 @@ export default function ImpactDashboardPage() {
 
         {/* ── Monthly Trend (Area Chart) ── */}
         <motion.div
-          initial={{ opacity: 0, y: 25 }}
+          initial={{ opacity: 1, y: 25 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-50px' }}
           transition={{ duration: 0.6 }}
@@ -314,7 +314,7 @@ export default function ImpactDashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Pie Chart: Food Categories */}
           <motion.div
-            initial={{ opacity: 0, y: 25 }}
+            initial={{ opacity: 1, y: 25 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.6, delay: 0.1 }}
@@ -385,7 +385,7 @@ export default function ImpactDashboardPage() {
 
           {/* Bar Chart: Top Businesses */}
           <motion.div
-            initial={{ opacity: 0, y: 25 }}
+            initial={{ opacity: 1, y: 25 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -467,7 +467,7 @@ export default function ImpactDashboardPage() {
 
         {/* ── Community Stats Footer ── */}
         <motion.div
-          initial={{ opacity: 0, y: 25 }}
+          initial={{ opacity: 1, y: 25 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-50px' }}
           transition={{ duration: 0.6, delay: 0.1 }}

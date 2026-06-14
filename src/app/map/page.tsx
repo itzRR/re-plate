@@ -268,7 +268,7 @@ export default function MapPage() {
                 <motion.button
                   key={listing.id}
                   layout
-                  initial={{ opacity: 0, x: -20 }}
+                  initial={{ opacity: 1, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ delay: i * 0.03 }}

@@ -99,7 +99,7 @@ export default function PostFoodPage() {
     return (
       <div className="min-h-screen pt-24 pb-16 px-4 flex items-center justify-center">
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={{ opacity: 1, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           className="text-center"
         >
@@ -143,7 +143,7 @@ export default function PostFoodPage() {
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 1, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
@@ -264,7 +264,7 @@ export default function PostFoodPage() {
                 <AnimatePresence>
                   {aiLoading && (
                     <motion.div
-                      initial={{ opacity: 0 }}
+                      initial={{ opacity: 1 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                       className="absolute inset-0 rounded-xl bg-purple-500/5 backdrop-blur-[1px] flex items-center justify-center"
@@ -281,7 +281,7 @@ export default function PostFoodPage() {
               <AnimatePresence>
                 {aiError && (
                   <motion.p
-                    initial={{ opacity: 0, y: -4 }}
+                    initial={{ opacity: 1, y: -4 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -4 }}
                     className="text-xs text-red-400 mt-1.5"
@@ -425,7 +425,7 @@ export default function PostFoodPage() {
 
           {/* Submit */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 1, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="flex gap-4"
