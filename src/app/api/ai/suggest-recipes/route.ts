@@ -58,15 +58,26 @@ Respond in this exact JSON format and nothing else:
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.8,
+            maxOutputTokens: 1024,
+          },
         }),
       }
     );
 
     if (!response.ok) {
       const errorData = await response.text();
-      console.error('Gemini API error:', errorData);
+      console.error('Gemini API error:', response.status, errorData);
+      
+      let errorMessage = 'Failed to generate recipe suggestions';
+      try {
+        const parsed = JSON.parse(errorData);
+        errorMessage = parsed?.error?.message || errorMessage;
+      } catch {}
+      
       return NextResponse.json(
-        { error: 'Failed to generate recipe suggestions' },
+        { error: errorMessage },
         { status: 502 }
       );
     }
